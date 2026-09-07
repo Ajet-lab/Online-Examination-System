@@ -1,11 +1,16 @@
+```javascript
 // =========================================
 // EXAM VARIABLES
 // =========================================
 
 let questions = [];
+
 let currentQuestionIndex = 0;
+
 let answers = {};
+
 let timeRemaining = 30 * 60;
+
 let timer;
 
 
@@ -14,54 +19,183 @@ let timer;
 // =========================================
 
 async function loadQuestions() {
+
     try {
+
         // Get the exam ID from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const examId = urlParams.get('examId');
+        const urlParams =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const examId =
+            urlParams.get('examId');
+
+
+        // =========================================
+        // CHECK EXAM ID
+        // =========================================
 
         if (!examId) {
-            alert('Exam ID is missing.');
+
+            alert(
+                'Exam ID is missing.'
+            );
+
+            window.location.href =
+                'dashboard.html';
+
             return;
         }
 
-        // Get the exam details
-        const examResponse = await fetch(`/api/exams/${examId}`);
+
+        // =========================================
+        // CHECK LOGIN
+        // =========================================
+
+        const token =
+            localStorage.getItem('token');
+
+        if (!token) {
+
+            alert(
+                'You are not logged in.'
+            );
+
+            window.location.href =
+                'login.html';
+
+            return;
+        }
+
+
+        // =========================================
+        // GET EXAM DETAILS
+        // =========================================
+
+        const examResponse =
+            await fetch(
+                `/api/exams/${examId}`,
+                {
+                    headers: {
+                        'Authorization':
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
 
         if (!examResponse.ok) {
-            throw new Error('Unable to load exam');
+
+            throw new Error(
+                'Unable to load exam'
+            );
         }
 
-        const examData = await examResponse.json();
 
-        // Use the exam duration from the database
-        timeRemaining = examData.exam.duration_minutes * 60;
+        const examData =
+            await examResponse.json();
 
-        // Get the questions
-        const response = await fetch(
-            `/api/questions/exam/${examId}`
-        );
+
+        // =========================================
+        // DISPLAY EXAM TITLE
+        // =========================================
+
+        const examTitle =
+            document.getElementById(
+                'examTitle'
+            );
+
+        if (examTitle) {
+
+            examTitle.textContent =
+                examData.exam.title;
+        }
+
+
+        // =========================================
+        // USE EXAM DURATION FROM DATABASE
+        // =========================================
+
+        timeRemaining =
+            examData.exam.duration_minutes * 60;
+
+
+        // =========================================
+        // GET EXAM QUESTIONS
+        // =========================================
+
+        const response =
+            await fetch(
+                `/api/questions/exam/${examId}`,
+                {
+                    headers: {
+                        'Authorization':
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
 
         if (!response.ok) {
-            throw new Error('Unable to load questions');
+
+            throw new Error(
+                'Unable to load questions'
+            );
         }
 
-        const data = await response.json();
 
-        questions = data.questions;
+        const data =
+            await response.json();
 
-        if (questions.length === 0) {
-            alert('This exam has no questions.');
+
+        questions =
+            data.questions;
+
+
+        // =========================================
+        // CHECK WHETHER QUESTIONS EXIST
+        // =========================================
+
+        if (
+            !questions ||
+            questions.length === 0
+        ) {
+
+            alert(
+                'This exam has no questions.'
+            );
+
+            window.location.href =
+                'dashboard.html';
+
             return;
         }
 
+
+        // =========================================
+        // START EXAM
+        // =========================================
+
         startTimer();
+
         renderQuestion();
+
         createQuestionNavigator();
 
     } catch (error) {
-        console.error('Error loading exam:', error);
 
-        alert('Unable to load the examination.');
+        console.error(
+            'Error loading exam:',
+            error
+        );
+
+        alert(
+            'Unable to load the examination.'
+        );
+
+        window.location.href =
+            'dashboard.html';
     }
 }
 
@@ -71,69 +205,178 @@ async function loadQuestions() {
 // =========================================
 
 function renderQuestion() {
-    const q = questions[currentQuestionIndex];
+
+    const q =
+        questions[
+            currentQuestionIndex
+        ];
+
 
     const questionCounter =
-        document.querySelector('.question-counter p');
+        document.querySelector(
+            '.question-counter p'
+        );
+
 
     const questionText =
-        document.querySelector('.question-text');
+        document.querySelector(
+            '.question-text'
+        );
+
 
     const optionsForm =
-        document.querySelector('.options');
+        document.querySelector(
+            '.options'
+        );
+
+
+    // =========================================
+    // QUESTION COUNTER
+    // =========================================
 
     questionCounter.textContent =
-        `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+        `Question ${
+            currentQuestionIndex + 1
+        } of ${
+            questions.length
+        }`;
+
+
+    // =========================================
+    // QUESTION TEXT
+    // =========================================
 
     questionText.textContent =
-        `${currentQuestionIndex + 1}. ${q.question_text}`;
+        `${
+            currentQuestionIndex + 1
+        }. ${
+            q.question_text
+        }`;
+
+
+    // =========================================
+    // CLEAR OLD OPTIONS
+    // =========================================
 
     optionsForm.innerHTML = '';
 
-    const letters = ['A', 'B', 'C', 'D'];
 
-    const optionTexts = [
-        q.option_a,
-        q.option_b,
-        q.option_c,
-        q.option_d
+    // =========================================
+    // CREATE OPTIONS
+    // =========================================
+
+    const letters = [
+        'A',
+        'B',
+        'C',
+        'D'
     ];
 
-    optionTexts.forEach(function(optionText, index) {
 
-        const label = document.createElement('label');
+    const optionTexts = [
 
-        label.className = 'option';
+        q.option_a,
 
-        const input = document.createElement('input');
+        q.option_b,
 
-        input.type = 'radio';
+        q.option_c,
 
-        input.name = `question${q.id}`;
+        q.option_d
 
-        input.value = letters[index];
+    ];
 
-        // Restore previously selected answer
-        if (answers[q.id] === letters[index]) {
-            input.checked = true;
+
+    optionTexts.forEach(
+        function(
+            optionText,
+            index
+        ) {
+
+            const label =
+                document.createElement(
+                    'label'
+                );
+
+
+            label.className =
+                'option';
+
+
+            const input =
+                document.createElement(
+                    'input'
+                );
+
+
+            input.type =
+                'radio';
+
+
+            input.name =
+                `question${q.id}`;
+
+
+            input.value =
+                letters[index];
+
+
+            // =========================================
+            // RESTORE PREVIOUS ANSWER
+            // =========================================
+
+            if (
+                answers[q.id] ===
+                letters[index]
+            ) {
+
+                input.checked =
+                    true;
+            }
+
+
+            // =========================================
+            // SAVE ANSWER
+            // =========================================
+
+            input.addEventListener(
+                'change',
+                function() {
+
+                    answers[q.id] =
+                        this.value;
+
+                    updateQuestionNavigator();
+
+                }
+            );
+
+
+            label.appendChild(
+                input
+            );
+
+
+            label.appendChild(
+                document.createTextNode(
+                    ` ${
+                        letters[index]
+                    }. ${
+                        optionText
+                    }`
+                )
+            );
+
+
+            optionsForm.appendChild(
+                label
+            );
+
         }
+    );
 
-        input.addEventListener('change', function() {
-            answers[q.id] = this.value;
-        });
-
-        label.appendChild(input);
-
-        label.appendChild(
-            document.createTextNode(
-                ` ${letters[index]}. ${optionText}`
-            )
-        );
-
-        optionsForm.appendChild(label);
-    });
 
     updateNavigationButtons();
+
     updateQuestionNavigator();
 }
 
@@ -144,11 +387,18 @@ function renderQuestion() {
 
 function goToQuestion(index) {
 
-    if (index < 0 || index >= questions.length) {
+    if (
+        index < 0 ||
+        index >= questions.length
+    ) {
+
         return;
     }
 
-    currentQuestionIndex = index;
+
+    currentQuestionIndex =
+        index;
+
 
     renderQuestion();
 }
@@ -161,27 +411,57 @@ function goToQuestion(index) {
 function createQuestionNavigator() {
 
     const navigator =
-        document.querySelector('.question-navigator');
+        document.querySelector(
+            '.question-navigator'
+        );
+
 
     navigator.innerHTML = '';
 
-    questions.forEach(function(question, index) {
 
-        const button =
-            document.createElement('button');
+    questions.forEach(
+        function(
+            question,
+            index
+        ) {
 
-        button.type = 'button';
+            const button =
+                document.createElement(
+                    'button'
+                );
 
-        button.className = 'nav-btn';
 
-        button.textContent = index + 1;
+            button.type =
+                'button';
 
-        button.addEventListener('click', function() {
-            goToQuestion(index);
-        });
 
-        navigator.appendChild(button);
-    });
+            button.className =
+                'nav-btn';
+
+
+            button.textContent =
+                index + 1;
+
+
+            button.addEventListener(
+                'click',
+                function() {
+
+                    goToQuestion(
+                        index
+                    );
+
+                }
+            );
+
+
+            navigator.appendChild(
+                button
+            );
+
+        }
+    );
+
 
     updateQuestionNavigator();
 }
@@ -194,20 +474,52 @@ function createQuestionNavigator() {
 function updateQuestionNavigator() {
 
     const buttons =
-        document.querySelectorAll('.nav-btn');
+        document.querySelectorAll(
+            '.nav-btn'
+        );
 
-    buttons.forEach(function(button, index) {
 
-        button.classList.remove('active');
+    buttons.forEach(
+        function(
+            button,
+            index
+        ) {
 
-        if (index === currentQuestionIndex) {
-            button.classList.add('active');
+            button.classList.remove(
+                'active'
+            );
+
+
+            if (
+                index ===
+                currentQuestionIndex
+            ) {
+
+                button.classList.add(
+                    'active'
+                );
+            }
+
+
+            if (
+                answers[
+                    questions[index].id
+                ]
+            ) {
+
+                button.classList.add(
+                    'answered'
+                );
+
+            } else {
+
+                button.classList.remove(
+                    'answered'
+                );
+            }
+
         }
-
-        if (answers[questions[index].id]) {
-            button.classList.add('answered');
-        }
-    });
+    );
 }
 
 
@@ -218,16 +530,24 @@ function updateQuestionNavigator() {
 function updateNavigationButtons() {
 
     const previousButton =
-        document.querySelector('.btn-prev');
+        document.querySelector(
+            '.btn-prev'
+        );
+
 
     const nextButton =
-        document.querySelector('.btn-next');
+        document.querySelector(
+            '.btn-next'
+        );
+
 
     previousButton.disabled =
         currentQuestionIndex === 0;
 
+
     nextButton.disabled =
-        currentQuestionIndex === questions.length - 1;
+        currentQuestionIndex ===
+        questions.length - 1;
 }
 
 
@@ -235,24 +555,36 @@ function updateNavigationButtons() {
 // PREVIOUS QUESTION
 // =========================================
 
-document.querySelector('.btn-prev')
-    .addEventListener('click', function() {
+document
+    .querySelector('.btn-prev')
+    .addEventListener(
+        'click',
+        function() {
 
-        goToQuestion(currentQuestionIndex - 1);
+            goToQuestion(
+                currentQuestionIndex - 1
+            );
 
-    });
+        }
+    );
 
 
 // =========================================
 // NEXT QUESTION
 // =========================================
 
-document.querySelector('.btn-next')
-    .addEventListener('click', function() {
+document
+    .querySelector('.btn-next')
+    .addEventListener(
+        'click',
+        function() {
 
-        goToQuestion(currentQuestionIndex + 1);
+            goToQuestion(
+                currentQuestionIndex + 1
+            );
 
-    });
+        }
+    );
 
 
 // =========================================
@@ -263,23 +595,40 @@ function startTimer() {
 
     updateTimerDisplay();
 
-    timer = setInterval(function() {
 
-        timeRemaining--;
+    timer =
+        setInterval(
+            function() {
 
-        updateTimerDisplay();
+                timeRemaining--;
 
-        if (timeRemaining <= 0) {
+                updateTimerDisplay();
 
-            clearInterval(timer);
 
-            alert('Time is up. Your exam will be submitted automatically.');
+                // =========================================
+                // AUTOMATIC SUBMISSION
+                // =========================================
 
-            submitExam();
+                if (
+                    timeRemaining <= 0
+                ) {
 
-        }
+                    clearInterval(
+                        timer
+                    );
 
-    }, 1000);
+
+                    alert(
+                        'Time is up. Your exam will be submitted automatically.'
+                    );
+
+
+                    submitExam();
+                }
+
+            },
+            1000
+        );
 }
 
 
@@ -290,16 +639,29 @@ function startTimer() {
 function updateTimerDisplay() {
 
     const timerValue =
-        document.querySelector('.timer-value');
+        document.querySelector(
+            '.timer-value'
+        );
+
 
     const minutes =
-        Math.floor(timeRemaining / 60);
+        Math.floor(
+            timeRemaining / 60
+        );
+
 
     const seconds =
         timeRemaining % 60;
 
+
     timerValue.textContent =
-        `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        `${
+            String(minutes)
+                .padStart(2, '0')
+        }:${
+            String(seconds)
+                .padStart(2, '0')
+        }`;
 }
 
 
@@ -309,76 +671,151 @@ function updateTimerDisplay() {
 
 async function submitExam() {
 
-    clearInterval(timer);
+    clearInterval(
+        timer
+    );
+
 
     const urlParams =
-        new URLSearchParams(window.location.search);
+        new URLSearchParams(
+            window.location.search
+        );
+
 
     const examId =
-        urlParams.get('examId');
+        urlParams.get(
+            'examId'
+        );
+
 
     const token =
-        localStorage.getItem('token');
+        localStorage.getItem(
+            'token'
+        );
+
+
+    // =========================================
+    // CHECK LOGIN
+    // =========================================
 
     if (!token) {
-        alert('You are not logged in.');
+
+        alert(
+            'You are not logged in.'
+        );
+
+        window.location.href =
+            'login.html';
 
         return;
     }
 
+
+    // =========================================
+    // FORMAT ANSWERS
+    // =========================================
+
     const formattedAnswers =
-        questions.map(function(question) {
+        questions.map(
+            function(question) {
 
-            return {
-                question_id: question.id,
-                selected_answer:
-                    answers[question.id] || null
-            };
+                return {
 
-        });
+                    question_id:
+                        question.id,
 
-    try {
+                    selected_answer:
+                        answers[
+                            question.id
+                        ] || null
 
-        const response = await fetch(
-            `/api/results/exam/${examId}/submit`,
-            {
-                method: 'POST',
+                };
 
-                headers: {
-                    'Content-Type': 'application/json',
-
-                    'Authorization':
-                        `Bearer ${token}`
-                },
-
-                body: JSON.stringify({
-                    answers: formattedAnswers
-                })
             }
         );
 
-        const data = await response.json();
+
+    try {
+
+        // =========================================
+        // SEND ANSWERS TO BACKEND
+        // =========================================
+
+        const response =
+            await fetch(
+                `/api/results/exam/${examId}/submit`,
+                {
+                    method: 'POST',
+
+                    headers: {
+
+                        'Content-Type':
+                            'application/json',
+
+                        'Authorization':
+                            `Bearer ${token}`
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            {
+                                answers:
+                                    formattedAnswers
+                            }
+                        )
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        // =========================================
+        // HANDLE SUBMISSION ERROR
+        // =========================================
 
         if (!response.ok) {
-            alert(data.message || 'Unable to submit exam.');
+
+            alert(
+                data.message ||
+                'Unable to submit exam.'
+            );
 
             return;
         }
 
-        // Save result temporarily for result page
-        localStorage.setItem(
-            'latestResult',
-            JSON.stringify(data.result)
+
+        // =========================================
+        // STUDENTS DO NOT SEE RESULTS
+        // =========================================
+
+        alert(
+            'Exam submitted successfully.'
         );
 
+
+        // =========================================
+        // RETURN TO DASHBOARD
+        // =========================================
+
         window.location.href =
-            `result.html?attemptId=${data.result.attempt_id}`;
+            'dashboard.html';
+
 
     } catch (error) {
 
-        console.error('Submit exam error:', error);
+        console.error(
+            'Submit exam error:',
+            error
+        );
 
-        alert('An error occurred while submitting the exam.');
+
+        alert(
+            'An error occurred while submitting the exam.'
+        );
+
     }
 }
 
@@ -387,19 +824,28 @@ async function submitExam() {
 // SUBMIT BUTTON
 // =========================================
 
-document.querySelector('.btn-submit')
-    .addEventListener('click', function() {
+document
+    .querySelector('.btn-submit')
+    .addEventListener(
+        'click',
+        function() {
 
-        const confirmSubmit =
-            confirm(
-                'Are you sure you want to submit your exam?'
-            );
+            const confirmSubmit =
+                confirm(
+                    'Are you sure you want to submit your exam?'
+                );
 
-        if (confirmSubmit) {
-            submitExam();
+
+            if (
+                confirmSubmit
+            ) {
+
+                submitExam();
+
+            }
+
         }
-
-    });
+    );
 
 
 // =========================================
@@ -407,3 +853,4 @@ document.querySelector('.btn-submit')
 // =========================================
 
 loadQuestions();
+```
