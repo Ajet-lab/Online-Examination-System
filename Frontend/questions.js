@@ -13,6 +13,8 @@ let timeRemaining = 30 * 60;
 
 let timer;
 
+let examSubmitted = false;
+
 
 // =========================================
 // LOAD QUESTIONS
@@ -22,7 +24,6 @@ async function loadQuestions() {
 
     try {
 
-        // Get the exam ID from the URL
         const urlParams =
             new URLSearchParams(
                 window.location.search
@@ -87,7 +88,11 @@ async function loadQuestions() {
 
         if (!examResponse.ok) {
 
+            const errorData =
+                await examResponse.json();
+
             throw new Error(
+                errorData.message ||
                 'Unable to load exam'
             );
         }
@@ -114,14 +119,6 @@ async function loadQuestions() {
 
 
         // =========================================
-        // USE EXAM DURATION FROM DATABASE
-        // =========================================
-
-        timeRemaining =
-            examData.exam.duration_minutes * 60;
-
-
-        // =========================================
         // GET EXAM QUESTIONS
         // =========================================
 
@@ -139,7 +136,11 @@ async function loadQuestions() {
 
         if (!response.ok) {
 
+            const errorData =
+                await response.json();
+
             throw new Error(
+                errorData.message ||
                 'Unable to load questions'
             );
         }
@@ -174,6 +175,51 @@ async function loadQuestions() {
 
 
         // =========================================
+        // START EXAM ON THE SERVER
+        // =========================================
+
+        const startResponse =
+            await fetch(
+                `/api/results/exam/${examId}/start`,
+                {
+                    method: 'POST',
+
+                    headers: {
+                        'Authorization':
+                            `Bearer ${token}`
+                    }
+                }
+            );
+
+
+        const startData =
+            await startResponse.json();
+
+
+        if (!startResponse.ok) {
+
+            alert(
+                startData.message ||
+                'Unable to start examination.'
+            );
+
+            window.location.href =
+                'dashboard.html';
+
+            return;
+        }
+
+
+        // =========================================
+        // USE EXAM DURATION
+        // =========================================
+
+        timeRemaining =
+            startData.attempt.duration_minutes *
+            60;
+
+
+        // =========================================
         // START EXAM
         // =========================================
 
@@ -191,6 +237,7 @@ async function loadQuestions() {
         );
 
         alert(
+            error.message ||
             'Unable to load the examination.'
         );
 
@@ -258,7 +305,8 @@ function renderQuestion() {
     // CLEAR OLD OPTIONS
     // =========================================
 
-    optionsForm.innerHTML = '';
+    optionsForm.innerHTML =
+        '';
 
 
     // =========================================
@@ -345,6 +393,7 @@ function renderQuestion() {
                     answers[q.id] =
                         this.value;
 
+
                     updateQuestionNavigator();
 
                 }
@@ -416,7 +465,8 @@ function createQuestionNavigator() {
         );
 
 
-    navigator.innerHTML = '';
+    navigator.innerHTML =
+        '';
 
 
     questions.forEach(
@@ -516,6 +566,7 @@ function updateQuestionNavigator() {
                 button.classList.remove(
                     'answered'
                 );
+
             }
 
         }
@@ -671,6 +722,17 @@ function updateTimerDisplay() {
 
 async function submitExam() {
 
+    // Prevent duplicate submissions
+    if (examSubmitted) {
+
+        return;
+    }
+
+
+    examSubmitted =
+        true;
+
+
     clearInterval(
         timer
     );
@@ -778,6 +840,9 @@ async function submitExam() {
 
         if (!response.ok) {
 
+            examSubmitted =
+                false;
+
             alert(
                 data.message ||
                 'Unable to submit exam.'
@@ -788,7 +853,7 @@ async function submitExam() {
 
 
         // =========================================
-        // STUDENTS DO NOT SEE RESULTS
+        // STUDENT DOES NOT SEE RESULT
         // =========================================
 
         alert(
@@ -805,6 +870,10 @@ async function submitExam() {
 
 
     } catch (error) {
+
+        examSubmitted =
+            false;
+
 
         console.error(
             'Submit exam error:',
