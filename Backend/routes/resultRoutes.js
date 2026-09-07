@@ -1,3 +1,4 @@
+```javascript
 const express = require('express');
 
 const {
@@ -7,7 +8,10 @@ const {
     getResultById
 } = require('../controllers/resultController');
 
-const { protect, restrictTo } = require('../middleware/auth');
+const {
+    protect,
+    restrictTo
+} = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -27,6 +31,13 @@ router.post(
 // =========================================
 // GET MY RESULTS
 // =========================================
+// Students no longer need access to results.
+// This route is intentionally disabled by the
+// frontend and will not be used.
+
+
+/*
+
 
 router.get(
     '/my-results',
@@ -34,6 +45,9 @@ router.get(
     restrictTo('student'),
     getMyResults
 );
+
+
+*/
 
 
 // =========================================
@@ -55,8 +69,10 @@ router.get(
 router.get(
     '/:id',
     protect,
+    restrictTo('admin'),
     getResultById
 );
 
 
 module.exports = router;
+```
