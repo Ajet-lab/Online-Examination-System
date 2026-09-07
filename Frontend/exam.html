@@ -1,84 +1,229 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Examination Page</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
+
 <body>
+
+    <!-- =========================================
+         EXAM CONTAINER
+    ========================================= -->
+
     <div class="exam-container">
+
+
+        <!-- =========================================
+             EXAM HEADER
+        ========================================= -->
+
         <header class="exam-header">
-            <h1>MATHEMATICS EXAM</h1>
-            <p class="student-name">Student: Aaliyah</p>
+
+            <h1 id="examTitle">
+                Examination
+            </h1>
+
+            <p class="student-name" id="studentName">
+                Student: Loading...
+            </p>
+
         </header>
 
+
+        <!-- =========================================
+             EXAM BODY
+        ========================================= -->
+
         <main class="exam-body">
+
+
+            <!-- =========================================
+                 QUESTION COUNTER
+            ========================================= -->
+
             <div class="question-counter">
-                <p>Question 1 of 20</p>
+
+                <p>
+                    Question 1 of 1
+                </p>
+
             </div>
+
+
+            <!-- =========================================
+                 QUESTION
+            ========================================= -->
 
             <section class="question-block">
-                <p class="question-text">1. What is the inverse of the function f(x) = 2x - 3?</p>
+
+                <p class="question-text">
+                    Loading question...
+                </p>
+
+
+                <!-- =========================================
+                     ANSWER OPTIONS
+                ========================================= -->
+
                 <form class="options">
-                    <label class="option">
-                        <input type="radio" name="question1" value="A">
-                        A. 2x + 3
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="question1" value="B">
-                        B. 2y + 3
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="question1" value="C">
-                        C. (x + 3)/2
-                    </label>
-                    <label class="option">
-                        <input type="radio" name="question1" value="D">
-                        D. (y + 3)/2
-                    </label>
+
                 </form>
+
             </section>
 
+
+            <!-- =========================================
+                 PREVIOUS / NEXT BUTTONS
+            ========================================= -->
+
             <div class="exam-navigation">
-                <button type="button" class="btn-prev">Previous</button>
-                <button type="button" class="btn-next">Next</button>
+
+                <button
+                    type="button"
+                    class="btn-prev"
+                >
+                    Previous
+                </button>
+
+                <button
+                    type="button"
+                    class="btn-next"
+                >
+                    Next
+                </button>
+
             </div>
+
+
+            <!-- =========================================
+                 QUESTION NAVIGATOR
+            ========================================= -->
 
             <nav class="question-navigator">
-                <button type="button" class="nav-btn active">1</button>
-                <button type="button" class="nav-btn">2</button>
-                <button type="button" class="nav-btn">3</button>
-                <button type="button" class="nav-btn">4</button>
-                <button type="button" class="nav-btn">5</button>
-                <button type="button" class="nav-btn">6</button>
-                <button type="button" class="nav-btn">7</button>
-                <button type="button" class="nav-btn">8</button>
-                <button type="button" class="nav-btn">9</button>
-                <button type="button" class="nav-btn">10</button>
-                <button type="button" class="nav-btn">11</button>
-                <button type="button" class="nav-btn">12</button>
-                <button type="button" class="nav-btn">13</button>
-                <button type="button" class="nav-btn">14</button>
-                <button type="button" class="nav-btn">15</button>
-                <button type="button" class="nav-btn">16</button>
-                <button type="button" class="nav-btn">17</button>
-                <button type="button" class="nav-btn">18</button>
-                <button type="button" class="nav-btn">19</button>
-                <button type="button" class="nav-btn">20</button>
+
             </nav>
-            
+
+
+            <!-- =========================================
+                 SUBMIT EXAM
+            ========================================= -->
+
             <div class="submit-wrapper">
-                <button type="button" class="btn-submit">Submit Exam</button>
+
+                <button
+                    type="button"
+                    class="btn-submit"
+                >
+                    Submit Exam
+                </button>
+
             </div>
+
         </main>
 
+
+        <!-- =========================================
+             TIMER
+        ========================================= -->
+
         <footer class="exam-timer-footer">
+
             <div class="timer">
-                <span class="timer-label">Time Remaining</span>
-                <span class="timer-value">29:45</span>
+
+                <span class="timer-label">
+                    Time Remaining
+                </span>
+
+                <span class="timer-value">
+                    00:00
+                </span>
+
             </div>
+
         </footer>
+
     </div>
+
+
+    <!-- =========================================
+         LOAD STUDENT INFORMATION
+    ========================================= -->
+
+    <script>
+
+        // =========================================
+        // CHECK LOGIN
+        // =========================================
+
+        const token =
+            localStorage.getItem('token');
+
+        if (!token) {
+
+            window.location.href =
+                'login.html';
+
+        }
+
+
+        // =========================================
+        // DISPLAY STUDENT NAME
+        // =========================================
+
+        const savedUser =
+            localStorage.getItem('user');
+
+        if (savedUser) {
+
+            try {
+
+                const user =
+                    JSON.parse(savedUser);
+
+                if (
+                    user &&
+                    user.role === 'student'
+                ) {
+
+                    document
+                        .getElementById('studentName')
+                        .textContent =
+                        `Student: ${user.name}`;
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Unable to read student information:',
+                    error
+                );
+
+            }
+
+        }
+
+    </script>
+
+
+    <!-- =========================================
+         EXAM JAVASCRIPT
+    ========================================= -->
+
+    <script src="question.js"></script>
+
 </body>
+
 </html>
+```
