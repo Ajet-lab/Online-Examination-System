@@ -1,7 +1,9 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
 
     <meta name="viewport"
@@ -10,11 +12,15 @@
     <title>Student Dashboard</title>
 
     <link rel="stylesheet" href="css/style.css">
+
 </head>
 
 <body>
 
-    <!-- Navigation Bar -->
+    <!-- =========================================
+         NAVIGATION BAR
+    ========================================= -->
+
     <nav class="navbar">
 
         <div class="logo">
@@ -22,37 +28,62 @@
         </div>
 
         <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="login.html">Logout</a></li>
+
+            <li>
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="dashboard.html">
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="#" id="logoutLink">
+                    Logout
+                </a>
+            </li>
+
         </ul>
 
     </nav>
 
 
-    <!-- Main Dashboard -->
+    <!-- =========================================
+         MAIN DASHBOARD
+    ========================================= -->
+
     <main class="container">
 
-        <!-- Welcome Section -->
+        <!-- =========================================
+             WELCOME SECTION
+        ========================================= -->
+
         <div class="card">
 
             <h1 class="page-title">
                 Student Dashboard
             </h1>
 
-            <h2>
-                Welcome, Student
+            <h2 id="welcomeMessage">
+                Welcome
             </h2>
 
             <p>
-                From your dashboard, you can view your student information
-                and available examinations.
+                From your dashboard, you can view your student
+                information and examinations assigned to you.
             </p>
 
         </div>
 
 
-        <!-- Student Information -->
+        <!-- =========================================
+             STUDENT INFORMATION
+        ========================================= -->
+
         <div class="card">
 
             <h2>
@@ -63,28 +94,46 @@
 
             <p>
                 <strong>Name:</strong>
-                Student Name
+                <span id="studentName">
+                    Loading...
+                </span>
             </p>
 
             <p>
                 <strong>Student ID:</strong>
-                SEN/2025/0000
+                <span id="studentId">
+                    Loading...
+                </span>
             </p>
 
             <p>
                 <strong>Email:</strong>
-                student@example.com
+                <span id="studentEmail">
+                    Loading...
+                </span>
             </p>
 
             <p>
                 <strong>Department:</strong>
-                Software Engineering
+                <span id="studentDepartment">
+                    Loading...
+                </span>
+            </p>
+
+            <p>
+                <strong>Level:</strong>
+                <span id="studentLevel">
+                    Loading...
+                </span>
             </p>
 
         </div>
 
 
-        <!-- Available Examinations -->
+        <!-- =========================================
+             ASSIGNED EXAMINATIONS
+        ========================================= -->
+
         <div class="card">
 
             <h2>
@@ -93,91 +142,43 @@
 
             <br>
 
-            <table>
+            <p id="examMessage">
+                Loading examinations...
+            </p>
+
+            <br>
+
+            <table id="examTable">
 
                 <thead>
 
                     <tr>
-                        <th>Examination</th>
-                        <th>Course</th>
-                        <th>Duration</th>
-                        <th>Action</th>
+
+                        <th>
+                            Examination
+                        </th>
+
+                        <th>
+                            Description
+                        </th>
+
+                        <th>
+                            Duration
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Action
+                        </th>
+
                     </tr>
 
                 </thead>
 
-                <tbody>
-
-                    <tr>
-
-                        <td>
-                            Software Engineering
-                        </td>
-
-                        <td>
-                            SEN 214
-                        </td>
-
-                        <td>
-                            30 Minutes
-                        </td>
-
-                        <td>
-                            <a href="exam.html"
-                               class="btn btn-success">
-                                Start Exam
-                            </a>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            Database Systems
-                        </td>
-
-                        <td>
-                            SEN 216
-                        </td>
-
-                        <td>
-                            45 Minutes
-                        </td>
-
-                        <td>
-                            <a href="exam.html"
-                               class="btn btn-success">
-                                Start Exam
-                            </a>
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td>
-                            Web Development
-                        </td>
-
-                        <td>
-                            SEN 218
-                        </td>
-
-                        <td>
-                            30 Minutes
-                        </td>
-
-                        <td>
-                            <a href="exam.html"
-                               class="btn btn-success">
-                                Start Exam
-                            </a>
-                        </td>
-
-                    </tr>
+                <tbody id="examTableBody">
 
                 </tbody>
 
@@ -186,20 +187,29 @@
         </div>
 
 
-        <!-- Logout -->
+        <!-- =========================================
+             LOGOUT BUTTON
+        ========================================= -->
+
         <div style="text-align: center; margin-top: 25px;">
 
-            <a href="login.html"
-               class="btn btn-danger">
+            <button
+                type="button"
+                class="btn btn-danger"
+                id="logoutButton"
+            >
                 Logout
-            </a>
+            </button>
 
         </div>
 
     </main>
 
 
-    <!-- Footer -->
+    <!-- =========================================
+         FOOTER
+    ========================================= -->
+
     <footer>
 
         <p>
@@ -208,6 +218,401 @@
 
     </footer>
 
+
+    <!-- =========================================
+         DASHBOARD JAVASCRIPT
+    ========================================= -->
+
+    <script>
+
+        // =========================================
+        // LOAD STUDENT INFORMATION
+        // =========================================
+
+        async function loadStudentInformation(token) {
+
+            const response =
+                await fetch(
+                    '/api/auth/me',
+                    {
+                        headers: {
+                            'Authorization':
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    'Unable to load student information.'
+                );
+            }
+
+            const student =
+                data.user;
+
+
+            // =========================================
+            // DISPLAY STUDENT INFORMATION
+            // =========================================
+
+            document
+                .getElementById('welcomeMessage')
+                .textContent =
+                `Welcome, ${student.name}`;
+
+            document
+                .getElementById('studentName')
+                .textContent =
+                student.name || 'Not available';
+
+            document
+                .getElementById('studentId')
+                .textContent =
+                student.student_id || 'Not available';
+
+            document
+                .getElementById('studentEmail')
+                .textContent =
+                student.email || 'Not available';
+
+            document
+                .getElementById('studentDepartment')
+                .textContent =
+                student.department || 'Not available';
+
+            document
+                .getElementById('studentLevel')
+                .textContent =
+                student.level || 'Not available';
+        }
+
+
+        // =========================================
+        // LOAD ASSIGNED EXAMS
+        // =========================================
+
+        async function loadAssignedExams(token) {
+
+            const response =
+                await fetch(
+                    '/api/registrations/my-exams',
+                    {
+                        headers: {
+                            'Authorization':
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            const data =
+                await response.json();
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    'Unable to load examinations.'
+                );
+            }
+
+
+            const examTableBody =
+                document.getElementById(
+                    'examTableBody'
+                );
+
+            const examMessage =
+                document.getElementById(
+                    'examMessage'
+                );
+
+
+            examTableBody.innerHTML = '';
+
+
+            // =========================================
+            // NO EXAMS
+            // =========================================
+
+            if (
+                !data.registrations ||
+                data.registrations.length === 0
+            ) {
+
+                examMessage.textContent =
+                    'No examinations have been assigned to you yet.';
+
+                return;
+            }
+
+
+            examMessage.textContent =
+                'These are the examinations assigned to you.';
+
+
+            // =========================================
+            // DISPLAY EXAMS
+            // =========================================
+
+            data.registrations.forEach(
+                function(registration) {
+
+                    const row =
+                        document.createElement('tr');
+
+
+                    // =========================================
+                    // EXAM NAME
+                    // =========================================
+
+                    const examNameCell =
+                        document.createElement('td');
+
+                    examNameCell.textContent =
+                        registration.title;
+
+
+                    // =========================================
+                    // DESCRIPTION
+                    // =========================================
+
+                    const descriptionCell =
+                        document.createElement('td');
+
+                    descriptionCell.textContent =
+                        registration.description ||
+                        'No description';
+
+
+                    // =========================================
+                    // DURATION
+                    // =========================================
+
+                    const durationCell =
+                        document.createElement('td');
+
+                    durationCell.textContent =
+                        `${registration.duration_minutes} Minutes`;
+
+
+                    // =========================================
+                    // REGISTRATION STATUS
+                    // =========================================
+
+                    const statusCell =
+                        document.createElement('td');
+
+                    statusCell.textContent =
+                        registration.registration_status;
+
+
+                    // =========================================
+                    // ACTION
+                    // =========================================
+
+                    const actionCell =
+                        document.createElement('td');
+
+
+                    // =========================================
+                    // CHECK EXAM STATUS
+                    // =========================================
+
+                    if (
+                        registration.exam_status !==
+                        'published'
+                    ) {
+
+                        actionCell.textContent =
+                            'Unavailable';
+
+                    } else if (
+                        registration.registration_status ===
+                        'completed'
+                    ) {
+
+                        actionCell.textContent =
+                            'Completed';
+
+                    } else {
+
+                        const startButton =
+                            document.createElement('a');
+
+                        startButton.href =
+                            `exam.html?examId=${registration.exam_id}`;
+
+                        startButton.className =
+                            'btn btn-success';
+
+                        startButton.textContent =
+                            'Start Exam';
+
+                        actionCell.appendChild(
+                            startButton
+                        );
+                    }
+
+
+                    row.appendChild(
+                        examNameCell
+                    );
+
+                    row.appendChild(
+                        descriptionCell
+                    );
+
+                    row.appendChild(
+                        durationCell
+                    );
+
+                    row.appendChild(
+                        statusCell
+                    );
+
+                    row.appendChild(
+                        actionCell
+                    );
+
+
+                    examTableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+        }
+
+
+        // =========================================
+        // LOGOUT
+        // =========================================
+
+        function logout() {
+
+            localStorage.removeItem(
+                'token'
+            );
+
+            localStorage.removeItem(
+                'user'
+            );
+
+            window.location.href =
+                'login.html';
+        }
+
+
+        // =========================================
+        // START DASHBOARD
+        // =========================================
+
+        async function loadDashboard() {
+
+            const token =
+                localStorage.getItem(
+                    'token'
+                );
+
+
+            // =========================================
+            // CHECK LOGIN
+            // =========================================
+
+            if (!token) {
+
+                window.location.href =
+                    'login.html';
+
+                return;
+            }
+
+
+            try {
+
+                await loadStudentInformation(
+                    token
+                );
+
+                await loadAssignedExams(
+                    token
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Dashboard error:',
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    'Unable to load dashboard.'
+                );
+
+
+                // =========================================
+                // INVALID LOGIN
+                // =========================================
+
+                if (
+                    error.message.includes(
+                        'Authentication'
+                    ) ||
+                    error.message.includes(
+                        'token'
+                    )
+                ) {
+
+                    logout();
+                }
+            }
+        }
+
+
+        // =========================================
+        // LOGOUT EVENTS
+        // =========================================
+
+        document
+            .getElementById('logoutLink')
+            .addEventListener(
+                'click',
+                function(event) {
+
+                    event.preventDefault();
+
+                    logout();
+                }
+            );
+
+
+        document
+            .getElementById('logoutButton')
+            .addEventListener(
+                'click',
+                function() {
+
+                    logout();
+                }
+            );
+
+
+        // =========================================
+        // LOAD DASHBOARD
+        // =========================================
+
+        loadDashboard();
+
+    </script>
+
 </body>
 
 </html>
+```
