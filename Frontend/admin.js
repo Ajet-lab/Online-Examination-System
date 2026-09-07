@@ -1,8 +1,30 @@
+```javascript
 document.addEventListener("DOMContentLoaded", function () {
 
-    // ==========================================
+    // =========================================
+    // GET LOGIN TOKEN
+    // =========================================
+
+    const token =
+        localStorage.getItem("token");
+
+
+    // =========================================
+    // CHECK ADMIN LOGIN
+    // =========================================
+
+    if (!token) {
+
+        window.location.href =
+            "admin-login.html";
+
+        return;
+    }
+
+
+    // =========================================
     // DASHBOARD ELEMENTS
-    // ==========================================
+    // =========================================
 
     const dashboardContent =
         document.getElementById("dashboardContent");
@@ -42,551 +64,822 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("viewResultsBtn");
 
 
+    // =========================================
+    // API REQUEST HELPER
+    // =========================================
 
-    // ==========================================
-    // TEMPORARY EXAM DATA
-    // ==========================================
+    async function apiRequest(url, options = {}) {
 
-    let exams = [
-        {
-            id: 1,
-            title: "Mathematics Examination",
-            description: "Basic Mathematics Examination",
-            duration: 30,
-            status: "Published"
-        },
+        const requestOptions = {
 
-        {
-            id: 2,
-            title: "SEN 214 Examination",
-            description: "Software Engineering Examination",
-            duration: 45,
-            status: "Draft"
-        }
-    ];
+            ...options,
 
+            headers: {
 
+                ...(options.headers || {}),
 
-    // ==========================================
-    // TEMPORARY QUESTION DATA
-    // ==========================================
+                "Authorization":
+                    `Bearer ${token}`
 
-    let questions = [
-        {
-            id: 1,
-            examId: 1,
-            question: "What is 2 + 2?",
-            optionA: "3",
-            optionB: "4",
-            optionC: "5",
-            optionD: "6",
-            correctAnswer: "B",
-            marks: 1
-        }
-    ];
-
-
-
-    // ==========================================
-    // TEMPORARY STUDENT DATA
-    // ==========================================
-
-    let students = [
-        {
-            id: 1,
-            name: "Adeoye Othniel",
-            studentNumber: "OAU/SE/001",
-            email: "adeoye@example.com",
-            department: "Software Engineering",
-            level: "400",
-            status: "Active"
-        },
-
-        {
-            id: 2,
-            name: "Aaliyah James",
-            studentNumber: "OAU/SE/002",
-            email: "aaliyah@example.com",
-            department: "Computer Science",
-            level: "300",
-            status: "Active"
-        },
-
-        {
-            id: 3,
-            name: "David John",
-            studentNumber: "OAU/SE/003",
-            email: "david@example.com",
-            department: "Software Engineering",
-            level: "400",
-            status: "Active"
-        }
-    ];
-
-
-
-    // ==========================================
-    // TEMPORARY RESULT DATA
-    // ==========================================
-
-    let results = [
-        {
-            studentName: "Adeoye Othniel",
-            studentNumber: "OAU/SE/001",
-            exam: "Mathematics Examination",
-            score: 18,
-            percentage: 90,
-            status: "Pass"
-        },
-
-        {
-            studentName: "Aaliyah James",
-            studentNumber: "OAU/SE/002",
-            exam: "SEN 214 Examination",
-            score: 12,
-            percentage: 60,
-            status: "Pass"
-        }
-    ];
-
-
-
-    // ==========================================
-    // EXAM ASSIGNMENTS
-    // ==========================================
-
-    let examAssignments = [];
-
-
-
-    // ==========================================
-    // GENERATE IDs
-    // ==========================================
-
-    let nextExamId = 3;
-    let nextQuestionId = 2;
-    let nextStudentId = 4;
-
-
-
-    // ==========================================
-    // SHOW DASHBOARD
-    // ==========================================
-
-    function showDashboard() {
-
-        dashboardContent.style.display = "block";
-
-        manageExamsSection.style.display = "none";
-
-        manageQuestionsSection.style.display = "none";
-
-        studentsSection.style.display = "none";
-
-        examRegistrationSection.style.display = "none";
-
-        resultsSection.style.display = "none";
-    }
-
-
-
-    // ==========================================
-    // MANAGE EXAMS SECTION
-    // ==========================================
-
-    manageExamsBtn.addEventListener("click", function () {
-
-        dashboardContent.style.display = "none";
-
-        manageQuestionsSection.style.display = "none";
-
-        studentsSection.style.display = "none";
-
-        examRegistrationSection.style.display = "none";
-
-        resultsSection.style.display = "none";
-
-        manageExamsSection.style.display = "block";
-
-        displayExams();
-    });
-
-
-
-    // BACK TO DASHBOARD
-
-    document
-        .getElementById("backToDashboardBtn")
-        .addEventListener("click", showDashboard);
-
-
-
-    // ADD EXAM
-
-    document
-        .getElementById("addExamBtn")
-        .addEventListener("click", function () {
-
-            document
-                .getElementById("examFormContainer")
-                .style.display = "block";
-
-            document
-                .getElementById("examFormTitle")
-                .textContent = "Add New Exam";
-
-            document
-                .getElementById("examForm")
-                .reset();
-
-            document
-                .getElementById("examId")
-                .value = "";
-        });
-
-
-
-    // CANCEL EXAM
-
-    document
-        .getElementById("cancelExamBtn")
-        .addEventListener("click", function () {
-
-            document
-                .getElementById("examFormContainer")
-                .style.display = "none";
-        });
-
-
-
-    // SAVE EXAM
-
-    document
-        .getElementById("examForm")
-        .addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-            const id =
-                document.getElementById("examId").value;
-
-            const title =
-                document.getElementById("examTitle").value;
-
-            const description =
-                document.getElementById("examDescription").value;
-
-            const duration =
-                document.getElementById("examDuration").value;
-
-
-
-            if (id) {
-
-                const exam = exams.find(
-                    function (item) {
-                        return item.id === Number(id);
-                    }
-                );
-
-                exam.title = title;
-                exam.description = description;
-                exam.duration = duration;
-
-                alert("Exam updated successfully.");
-
-            } else {
-
-                exams.push({
-
-                    id: nextExamId++,
-
-                    title: title,
-
-                    description: description,
-
-                    duration: Number(duration),
-
-                    status: "Draft"
-
-                });
-
-                alert("Exam added successfully.");
             }
 
+        };
 
-            document
-                .getElementById("examForm")
-                .reset();
 
-            document
-                .getElementById("examFormContainer")
-                .style.display = "none";
-
-            displayExams();
-        });
-
-
-
-    // DISPLAY EXAMS
-
-    function displayExams() {
-
-        const tableBody =
-            document.getElementById("examTableBody");
-
-        tableBody.innerHTML = "";
-
-
-
-        if (exams.length === 0) {
-
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="5" style="text-align:center;">
-                        No exams available.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-
-
-        exams.forEach(function (exam) {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHTML(exam.title)}
-                </td>
-
-                <td>
-                    ${escapeHTML(exam.description)}
-                </td>
-
-                <td>
-                    ${exam.duration} minutes
-                </td>
-
-                <td>
-                    ${escapeHTML(exam.status)}
-                </td>
-
-                <td>
-
-                    <button
-                        class="btn btn-warning"
-                        onclick="editExam(${exam.id})">
-
-                        Edit
-
-                    </button>
-
-                    <button
-                        class="btn btn-danger"
-                        onclick="deleteExam(${exam.id})">
-
-                        Delete
-
-                    </button>
-
-                    <button
-                        class="btn btn-success"
-                        onclick="toggleExamStatus(${exam.id})">
-
-                        ${exam.status === "Published"
-                            ? "Unpublish"
-                            : "Publish"}
-
-                    </button>
-
-                </td>
-            `;
-
-
-            tableBody.appendChild(row);
-        });
-    }
-
-
-
-    // EDIT EXAM
-
-    window.editExam = function (id) {
-
-        const exam =
-            exams.find(function (item) {
-                return item.id === id;
-            });
-
-
-        if (!exam) {
-            return;
-        }
-
-
-        document
-            .getElementById("examFormContainer")
-            .style.display = "block";
-
-
-        document
-            .getElementById("examFormTitle")
-            .textContent = "Edit Exam";
-
-
-        document
-            .getElementById("examId")
-            .value = exam.id;
-
-
-        document
-            .getElementById("examTitle")
-            .value = exam.title;
-
-
-        document
-            .getElementById("examDescription")
-            .value = exam.description;
-
-
-        document
-            .getElementById("examDuration")
-            .value = exam.duration;
-    };
-
-
-
-    // DELETE EXAM
-
-    window.deleteExam = function (id) {
-
-        const exam =
-            exams.find(function (item) {
-                return item.id === id;
-            });
-
-
-        if (!exam) {
-            return;
-        }
-
-
-        const confirmed =
-            confirm(
-                `Are you sure you want to delete "${exam.title}"?`
+        const response =
+            await fetch(
+                url,
+                requestOptions
             );
 
 
-        if (!confirmed) {
-            return;
+        let data = {};
+
+        try {
+
+            data =
+                await response.json();
+
+        } catch (error) {
+
+            data = {};
+
         }
 
 
-        exams =
-            exams.filter(function (item) {
-                return item.id !== id;
-            });
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
 
+            alert(
+                data.message ||
+                "You are not authorized to perform this action."
+            );
 
-        questions =
-            questions.filter(function (item) {
-                return item.examId !== id;
-            });
+            localStorage.removeItem("token");
 
+            localStorage.removeItem("user");
 
-        examAssignments =
-            examAssignments.filter(function (item) {
-                return item.examId !== id;
-            });
+            window.location.href =
+                "admin-login.html";
 
-
-        displayExams();
-
-
-        alert("Exam deleted successfully.");
-    };
-
-
-
-    // PUBLISH / UNPUBLISH EXAM
-
-    window.toggleExamStatus = function (id) {
-
-        const exam =
-            exams.find(function (item) {
-                return item.id === id;
-            });
-
-
-        if (!exam) {
-            return;
+            throw new Error(
+                "Authentication failed"
+            );
         }
 
 
-        if (exam.status === "Published") {
+        if (!response.ok) {
 
-            exam.status = "Draft";
-
-        } else {
-
-            exam.status = "Published";
+            throw new Error(
+                data.message ||
+                "Request failed"
+            );
         }
 
 
-        displayExams();
-    };
+        return data;
+    }
 
 
+    // =========================================
+    // SHOW DASHBOARD
+    // =========================================
 
-    // ==========================================
-    // MANAGE QUESTIONS
-    // ==========================================
+    function showDashboard() {
 
-    manageQuestionsBtn.addEventListener(
+        dashboardContent.style.display =
+            "block";
+
+        manageExamsSection.style.display =
+            "none";
+
+        manageQuestionsSection.style.display =
+            "none";
+
+        studentsSection.style.display =
+            "none";
+
+        examRegistrationSection.style.display =
+            "none";
+
+        resultsSection.style.display =
+            "none";
+
+    }
+
+
+    // =========================================
+    // LOAD ADMIN INFORMATION
+    // =========================================
+
+    async function loadAdminInformation() {
+
+        try {
+
+            const data =
+                await apiRequest(
+                    "/api/auth/me"
+                );
+
+
+            if (
+                !data.user ||
+                data.user.role !== "admin"
+            ) {
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "user"
+                );
+
+                window.location.href =
+                    "login.html";
+
+                return;
+            }
+
+
+            const adminName =
+                document.getElementById(
+                    "adminName"
+                );
+
+
+            if (adminName) {
+
+                adminName.textContent =
+                    data.user.name;
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Admin information error:",
+                error
+            );
+        }
+    }
+
+
+    // =========================================
+    // MANAGE EXAMS
+    // =========================================
+
+    manageExamsBtn.addEventListener(
         "click",
-        function () {
+        async function () {
 
-            dashboardContent.style.display = "none";
+            dashboardContent.style.display =
+                "none";
 
-            manageExamsSection.style.display = "none";
+            manageQuestionsSection.style.display =
+                "none";
 
-            studentsSection.style.display = "none";
+            studentsSection.style.display =
+                "none";
 
-            examRegistrationSection.style.display = "none";
+            examRegistrationSection.style.display =
+                "none";
 
-            resultsSection.style.display = "none";
+            resultsSection.style.display =
+                "none";
 
-            manageQuestionsSection.style.display = "block";
+            manageExamsSection.style.display =
+                "block";
 
-            loadQuestionExamDropdown();
+            await displayExams();
 
-            displayQuestions();
         }
     );
 
 
+    // =========================================
+    // BACK TO DASHBOARD
+    // =========================================
 
-    // BACK
+    document
+        .getElementById("backToDashboardBtn")
+        .addEventListener(
+            "click",
+            showDashboard
+        );
+
+
+    // =========================================
+    // ADD EXAM
+    // =========================================
+
+    document
+        .getElementById("addExamBtn")
+        .addEventListener(
+            "click",
+            function () {
+
+                document
+                    .getElementById(
+                        "examFormContainer"
+                    )
+                    .style.display =
+                    "block";
+
+
+                document
+                    .getElementById(
+                        "examFormTitle"
+                    )
+                    .textContent =
+                    "Add New Exam";
+
+
+                document
+                    .getElementById(
+                        "examForm"
+                    )
+                    .reset();
+
+
+                document
+                    .getElementById(
+                        "examId"
+                    )
+                    .value =
+                    "";
+
+            }
+        );
+
+
+    // =========================================
+    // CANCEL EXAM
+    // =========================================
+
+    document
+        .getElementById("cancelExamBtn")
+        .addEventListener(
+            "click",
+            function () {
+
+                document
+                    .getElementById(
+                        "examFormContainer"
+                    )
+                    .style.display =
+                    "none";
+
+            }
+        );
+
+
+    // =========================================
+    // SAVE EXAM
+    // =========================================
+
+    document
+        .getElementById("examForm")
+        .addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const id =
+                    document
+                        .getElementById("examId")
+                        .value;
+
+
+                const title =
+                    document
+                        .getElementById("examTitle")
+                        .value
+                        .trim();
+
+
+                const description =
+                    document
+                        .getElementById(
+                            "examDescription"
+                        )
+                        .value
+                        .trim();
+
+
+                const duration =
+                    Number(
+                        document
+                            .getElementById(
+                                "examDuration"
+                            )
+                            .value
+                    );
+
+
+                if (!title || !duration) {
+
+                    alert(
+                        "Exam title and duration are required."
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    if (id) {
+
+                        await apiRequest(
+                            `/api/exams/${id}`,
+                            {
+                                method: "PUT",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        title,
+                                        description,
+                                        duration_minutes:
+                                            duration
+                                    })
+                            }
+                        );
+
+
+                        alert(
+                            "Exam updated successfully."
+                        );
+
+                    } else {
+
+                        await apiRequest(
+                            "/api/exams",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+                                        title,
+                                        description,
+                                        duration_minutes:
+                                            duration
+                                    })
+                            }
+                        );
+
+
+                        alert(
+                            "Exam added successfully."
+                        );
+                    }
+
+
+                    document
+                        .getElementById("examForm")
+                        .reset();
+
+
+                    document
+                        .getElementById(
+                            "examFormContainer"
+                        )
+                        .style.display =
+                        "none";
+
+
+                    await displayExams();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Save exam error:",
+                        error
+                    );
+
+                    alert(
+                        error.message
+                    );
+
+                }
+
+            }
+        );
+
+
+    // =========================================
+    // GET ALL EXAMS
+    // =========================================
+
+    async function getExams() {
+
+        const data =
+            await apiRequest(
+                "/api/exams"
+            );
+
+        return data.exams || [];
+    }
+
+
+    // =========================================
+    // DISPLAY EXAMS
+    // =========================================
+
+    async function displayExams() {
+
+        const tableBody =
+            document.getElementById(
+                "examTableBody"
+            );
+
+
+        tableBody.innerHTML = "";
+
+
+        try {
+
+            const exams =
+                await getExams();
+
+
+            if (exams.length === 0) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align:center;">
+                            No exams available.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            exams.forEach(
+                function (exam) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHTML(
+                                exam.title
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                exam.description || ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${exam.duration_minutes}
+                            minutes
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                exam.status
+                            )}
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="btn btn-warning"
+                                onclick="editExam(${exam.id})"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                class="btn btn-danger"
+                                onclick="deleteExam(${exam.id})"
+                            >
+                                Delete
+                            </button>
+
+                            <button
+                                class="btn btn-success"
+                                onclick="toggleExamStatus(${exam.id})"
+                            >
+                                ${
+                                    exam.status === "published"
+                                    ? "Unpublish"
+                                    : "Publish"
+                                }
+                            </button>
+
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Display exams error:",
+                error
+            );
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center;">
+                        Unable to load exams.
+                    </td>
+                </tr>
+            `;
+
+        }
+    }
+
+
+    // =========================================
+    // EDIT EXAM
+    // =========================================
+
+    window.editExam = async function (id) {
+
+        try {
+
+            const data =
+                await apiRequest(
+                    `/api/exams/${id}`
+                );
+
+
+            const exam =
+                data.exam;
+
+
+            document
+                .getElementById(
+                    "examFormContainer"
+                )
+                .style.display =
+                "block";
+
+
+            document
+                .getElementById(
+                    "examFormTitle"
+                )
+                .textContent =
+                "Edit Exam";
+
+
+            document
+                .getElementById(
+                    "examId"
+                )
+                .value =
+                exam.id;
+
+
+            document
+                .getElementById(
+                    "examTitle"
+                )
+                .value =
+                exam.title;
+
+
+            document
+                .getElementById(
+                    "examDescription"
+                )
+                .value =
+                exam.description ||
+                "";
+
+
+            document
+                .getElementById(
+                    "examDuration"
+                )
+                .value =
+                exam.duration_minutes;
+
+        } catch (error) {
+
+            console.error(
+                "Edit exam error:",
+                error
+            );
+
+            alert(
+                error.message
+            );
+
+        }
+    };
+
+
+    // =========================================
+    // DELETE EXAM
+    // =========================================
+
+    window.deleteExam = async function (id) {
+
+        try {
+
+            const data =
+                await apiRequest(
+                    `/api/exams/${id}`
+                );
+
+
+            const confirmed =
+                confirm(
+                    `Are you sure you want to delete "${data.exam.title}"?`
+                );
+
+
+            if (!confirmed) {
+
+                return;
+            }
+
+
+            await apiRequest(
+                `/api/exams/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+            alert(
+                "Exam deleted successfully."
+            );
+
+
+            await displayExams();
+
+        } catch (error) {
+
+            console.error(
+                "Delete exam error:",
+                error
+            );
+
+            alert(
+                error.message
+            );
+
+        }
+    };
+
+
+    // =========================================
+    // PUBLISH / UNPUBLISH EXAM
+    // =========================================
+
+    window.toggleExamStatus =
+        async function (id) {
+
+            try {
+
+                const data =
+                    await apiRequest(
+                        `/api/exams/${id}`
+                    );
+
+
+                const newStatus =
+                    data.exam.status ===
+                    "published"
+                    ? "draft"
+                    : "published";
+
+
+                await apiRequest(
+                    `/api/exams/${id}/status`,
+                    {
+                        method: "PATCH",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                status:
+                                    newStatus
+                            })
+                    }
+                );
+
+
+                alert(
+                    newStatus === "published"
+                    ? "Exam published successfully."
+                    : "Exam unpublished successfully."
+                );
+
+
+                await displayExams();
+
+            } catch (error) {
+
+                console.error(
+                    "Update exam status error:",
+                    error
+                );
+
+                alert(
+                    error.message
+                );
+
+            }
+        };
+
+
+    // =========================================
+    // MANAGE QUESTIONS
+    // =========================================
+
+    manageQuestionsBtn.addEventListener(
+        "click",
+        async function () {
+
+            dashboardContent.style.display =
+                "none";
+
+            manageExamsSection.style.display =
+                "none";
+
+            studentsSection.style.display =
+                "none";
+
+            examRegistrationSection.style.display =
+                "none";
+
+            resultsSection.style.display =
+                "none";
+
+            manageQuestionsSection.style.display =
+                "block";
+
+
+            await loadQuestionExamDropdown();
+
+        }
+    );
+
+
+    // =========================================
+    // BACK FROM QUESTIONS
+    // =========================================
 
     document
         .getElementById("backFromQuestionsBtn")
-        .addEventListener("click", showDashboard);
+        .addEventListener(
+            "click",
+            showDashboard
+        );
 
 
+    // =========================================
+    // LOAD EXAMS INTO QUESTION DROPDOWN
+    // =========================================
 
-    // LOAD EXAMS
-
-    function loadQuestionExamDropdown() {
+    async function loadQuestionExamDropdown() {
 
         const select =
-            document.getElementById("questionExamSelect");
+            document.getElementById(
+                "questionExamSelect"
+            );
 
 
         select.innerHTML = `
@@ -596,216 +889,415 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
 
-        exams.forEach(function (exam) {
+        try {
 
-            const option =
-                document.createElement("option");
+            const exams =
+                await getExams();
 
-            option.value = exam.id;
 
-            option.textContent = exam.title;
+            exams.forEach(
+                function (exam) {
 
-            select.appendChild(option);
-        });
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    option.value =
+                        exam.id;
+
+
+                    option.textContent =
+                        exam.title;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+            await displayQuestions();
+
+        } catch (error) {
+
+            console.error(
+                "Load question exams error:",
+                error
+            );
+
+            alert(
+                error.message
+            );
+
+        }
     }
 
 
-
-    // SELECT EXAM
+    // =========================================
+    // SELECT EXAM FOR QUESTIONS
+    // =========================================
 
     document
-        .getElementById("questionExamSelect")
-        .addEventListener("change", function () {
+        .getElementById(
+            "questionExamSelect"
+        )
+        .addEventListener(
+            "change",
+            function () {
 
-            displayQuestions();
-        });
+                displayQuestions();
+
+            }
+        );
 
 
-
+    // =========================================
     // ADD QUESTION
+    // =========================================
 
     document
-        .getElementById("addQuestionBtn")
-        .addEventListener("click", function () {
+        .getElementById(
+            "addQuestionBtn"
+        )
+        .addEventListener(
+            "click",
+            function () {
 
-            const examId =
-                document.getElementById("questionExamSelect").value;
+                const examId =
+                    document
+                        .getElementById(
+                            "questionExamSelect"
+                        )
+                        .value;
 
 
-            if (!examId) {
+                if (!examId) {
 
-                alert("Please select an exam first.");
+                    alert(
+                        "Please select an exam first."
+                    );
 
-                return;
+                    return;
+                }
+
+
+                document
+                    .getElementById(
+                        "questionFormContainer"
+                    )
+                    .style.display =
+                    "block";
+
+
+                document
+                    .getElementById(
+                        "questionFormTitle"
+                    )
+                    .textContent =
+                    "Add Question";
+
+
+                document
+                    .getElementById(
+                        "questionForm"
+                    )
+                    .reset();
+
+
+                document
+                    .getElementById(
+                        "questionId"
+                    )
+                    .value =
+                    "";
+
             }
+        );
 
 
-            document
-                .getElementById("questionFormContainer")
-                .style.display = "block";
-
-
-            document
-                .getElementById("questionFormTitle")
-                .textContent = "Add Question";
-
-
-            document
-                .getElementById("questionForm")
-                .reset();
-
-
-            document
-                .getElementById("questionId")
-                .value = "";
-        });
-
-
-
+    // =========================================
     // CANCEL QUESTION
+    // =========================================
 
     document
-        .getElementById("cancelQuestionBtn")
-        .addEventListener("click", function () {
+        .getElementById(
+            "cancelQuestionBtn"
+        )
+        .addEventListener(
+            "click",
+            function () {
 
-            document
-                .getElementById("questionFormContainer")
-                .style.display = "none";
-        });
+                document
+                    .getElementById(
+                        "questionFormContainer"
+                    )
+                    .style.display =
+                    "none";
 
-
-
-    // SAVE QUESTION
-
-    document
-        .getElementById("questionForm")
-        .addEventListener("submit", function (event) {
-
-            event.preventDefault();
-
-
-            const id =
-                document.getElementById("questionId").value;
-
-
-            const examId =
-                Number(
-                    document.getElementById("questionExamSelect").value
-                );
-
-
-            const question =
-                document.getElementById("questionText").value;
-
-
-            const optionA =
-                document.getElementById("optionA").value;
-
-
-            const optionB =
-                document.getElementById("optionB").value;
-
-
-            const optionC =
-                document.getElementById("optionC").value;
-
-
-            const optionD =
-                document.getElementById("optionD").value;
-
-
-            const correctAnswer =
-                document.getElementById("correctAnswer").value;
-
-
-            const marks =
-                Number(
-                    document.getElementById("questionMarks").value
-                );
-
-
-
-            if (id) {
-
-                const existingQuestion =
-                    questions.find(function (item) {
-                        return item.id === Number(id);
-                    });
-
-
-                existingQuestion.question = question;
-
-                existingQuestion.optionA = optionA;
-
-                existingQuestion.optionB = optionB;
-
-                existingQuestion.optionC = optionC;
-
-                existingQuestion.optionD = optionD;
-
-                existingQuestion.correctAnswer =
-                    correctAnswer;
-
-                existingQuestion.marks = marks;
-
-
-                alert("Question updated successfully.");
-
-            } else {
-
-                questions.push({
-
-                    id: nextQuestionId++,
-
-                    examId: examId,
-
-                    question: question,
-
-                    optionA: optionA,
-
-                    optionB: optionB,
-
-                    optionC: optionC,
-
-                    optionD: optionD,
-
-                    correctAnswer: correctAnswer,
-
-                    marks: marks
-                });
-
-
-                alert("Question added successfully.");
             }
+        );
 
 
-            document
-                .getElementById("questionForm")
-                .reset();
+    // =========================================
+    // SAVE QUESTION
+    // =========================================
+
+    document
+        .getElementById(
+            "questionForm"
+        )
+        .addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
 
 
-            document
-                .getElementById("questionFormContainer")
-                .style.display = "none";
+                const id =
+                    document
+                        .getElementById(
+                            "questionId"
+                        )
+                        .value;
 
 
-            displayQuestions();
-        });
+                const examId =
+                    document
+                        .getElementById(
+                            "questionExamSelect"
+                        )
+                        .value;
 
 
+                const questionText =
+                    document
+                        .getElementById(
+                            "questionText"
+                        )
+                        .value
+                        .trim();
 
+
+                const optionA =
+                    document
+                        .getElementById(
+                            "optionA"
+                        )
+                        .value
+                        .trim();
+
+
+                const optionB =
+                    document
+                        .getElementById(
+                            "optionB"
+                        )
+                        .value
+                        .trim();
+
+
+                const optionC =
+                    document
+                        .getElementById(
+                            "optionC"
+                        )
+                        .value
+                        .trim();
+
+
+                const optionD =
+                    document
+                        .getElementById(
+                            "optionD"
+                        )
+                        .value
+                        .trim();
+
+
+                const correctAnswer =
+                    document
+                        .getElementById(
+                            "correctAnswer"
+                        )
+                        .value;
+
+
+                const marks =
+                    Number(
+                        document
+                            .getElementById(
+                                "questionMarks"
+                            )
+                            .value
+                    );
+
+
+                if (
+                    !examId ||
+                    !questionText ||
+                    !optionA ||
+                    !optionB ||
+                    !optionC ||
+                    !optionD ||
+                    !correctAnswer
+                ) {
+
+                    alert(
+                        "Please complete all question fields."
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    if (id) {
+
+                        await apiRequest(
+                            `/api/questions/${id}`,
+                            {
+                                method: "PUT",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        question_text:
+                                            questionText,
+
+                                        option_a:
+                                            optionA,
+
+                                        option_b:
+                                            optionB,
+
+                                        option_c:
+                                            optionC,
+
+                                        option_d:
+                                            optionD,
+
+                                        is_correct:
+                                            correctAnswer,
+
+                                        marks:
+                                            marks || 1
+
+                                    })
+                            }
+                        );
+
+
+                        alert(
+                            "Question updated successfully."
+                        );
+
+                    } else {
+
+                        await apiRequest(
+                            `/api/questions/exam/${examId}`,
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        question_text:
+                                            questionText,
+
+                                        option_a:
+                                            optionA,
+
+                                        option_b:
+                                            optionB,
+
+                                        option_c:
+                                            optionC,
+
+                                        option_d:
+                                            optionD,
+
+                                        is_correct:
+                                            correctAnswer,
+
+                                        marks:
+                                            marks || 1
+
+                                    })
+                            }
+                        );
+
+
+                        alert(
+                            "Question added successfully."
+                        );
+                    }
+
+
+                    document
+                        .getElementById(
+                            "questionForm"
+                        )
+                        .reset();
+
+
+                    document
+                        .getElementById(
+                            "questionFormContainer"
+                        )
+                        .style.display =
+                        "none";
+
+
+                    await displayQuestions();
+
+                } catch (error) {
+
+                    console.error(
+                        "Save question error:",
+                        error
+                    );
+
+                    alert(
+                        error.message
+                    );
+
+                }
+
+            }
+        );
+
+
+    // =========================================
     // DISPLAY QUESTIONS
+    // =========================================
 
-    function displayQuestions() {
+    async function displayQuestions() {
 
         const tableBody =
-            document.getElementById("questionTableBody");
+            document.getElementById(
+                "questionTableBody"
+            );
 
 
         const examId =
-            Number(
-                document.getElementById("questionExamSelect").value
-            );
+            document.getElementById(
+                "questionExamSelect"
+            ).value;
 
 
         tableBody.innerHTML = "";
@@ -825,506 +1317,836 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
 
-        const examQuestions =
-            questions.filter(function (question) {
+        try {
 
-                return question.examId === examId;
+            const data =
+                await apiRequest(
+                    `/api/questions/exam/${examId}`
+                );
 
-            });
+
+            const questions =
+                data.questions || [];
 
 
-        if (examQuestions.length === 0) {
+            if (questions.length === 0) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align:center;">
+                            No questions added yet.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            questions.forEach(
+                function (question) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHTML(
+                                question.question_text
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                question.is_correct ||
+                                ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${question.marks}
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="btn btn-warning"
+                                onclick="editQuestion(${question.id})"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                class="btn btn-danger"
+                                onclick="deleteQuestion(${question.id})"
+                            >
+                                Delete
+                            </button>
+
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Display questions error:",
+                error
+            );
 
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="4" style="text-align:center;">
-                        No questions added yet.
+                        Unable to load questions.
                     </td>
                 </tr>
             `;
 
-            return;
         }
-
-
-
-        examQuestions.forEach(function (question) {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHTML(question.question)}
-                </td>
-
-                <td>
-                    ${escapeHTML(question.correctAnswer)}
-                </td>
-
-                <td>
-                    ${question.marks}
-                </td>
-
-                <td>
-
-                    <button
-                        class="btn btn-warning"
-                        onclick="editQuestion(${question.id})">
-
-                        Edit
-
-                    </button>
-
-                    <button
-                        class="btn btn-danger"
-                        onclick="deleteQuestion(${question.id})">
-
-                        Delete
-
-                    </button>
-
-                </td>
-            `;
-
-
-            tableBody.appendChild(row);
-        });
     }
 
 
-
+    // =========================================
     // EDIT QUESTION
+    // =========================================
 
-    window.editQuestion = function (id) {
+    window.editQuestion =
+        async function (id) {
 
-        const question =
-            questions.find(function (item) {
-                return item.id === id;
-            });
+            try {
 
-
-        if (!question) {
-            return;
-        }
-
-
-        document
-            .getElementById("questionFormContainer")
-            .style.display = "block";
+                const data =
+                    await apiRequest(
+                        `/api/questions/${id}`
+                    );
 
 
-        document
-            .getElementById("questionFormTitle")
-            .textContent = "Edit Question";
+                const question =
+                    data.question;
 
 
-        document
-            .getElementById("questionId")
-            .value = question.id;
+                document
+                    .getElementById(
+                        "questionFormContainer"
+                    )
+                    .style.display =
+                    "block";
 
 
-        document
-            .getElementById("questionText")
-            .value = question.question;
+                document
+                    .getElementById(
+                        "questionFormTitle"
+                    )
+                    .textContent =
+                    "Edit Question";
 
 
-        document
-            .getElementById("optionA")
-            .value = question.optionA;
+                document
+                    .getElementById(
+                        "questionId"
+                    )
+                    .value =
+                    question.id;
 
 
-        document
-            .getElementById("optionB")
-            .value = question.optionB;
+                document
+                    .getElementById(
+                        "questionText"
+                    )
+                    .value =
+                    question.question_text;
 
 
-        document
-            .getElementById("optionC")
-            .value = question.optionC;
+                document
+                    .getElementById(
+                        "optionA"
+                    )
+                    .value =
+                    question.option_a;
 
 
-        document
-            .getElementById("optionD")
-            .value = question.optionD;
+                document
+                    .getElementById(
+                        "optionB"
+                    )
+                    .value =
+                    question.option_b;
 
 
-        document
-            .getElementById("correctAnswer")
-            .value = question.correctAnswer;
+                document
+                    .getElementById(
+                        "optionC"
+                    )
+                    .value =
+                    question.option_c;
 
 
-        document
-            .getElementById("questionMarks")
-            .value = question.marks;
-    };
+                document
+                    .getElementById(
+                        "optionD"
+                    )
+                    .value =
+                    question.option_d;
 
 
+                document
+                    .getElementById(
+                        "correctAnswer"
+                    )
+                    .value =
+                    question.is_correct;
 
+
+                document
+                    .getElementById(
+                        "questionMarks"
+                    )
+                    .value =
+                    question.marks;
+
+            } catch (error) {
+
+                console.error(
+                    "Edit question error:",
+                    error
+                );
+
+                alert(
+                    error.message
+                );
+
+            }
+        };
+
+
+    // =========================================
     // DELETE QUESTION
+    // =========================================
 
-    window.deleteQuestion = function (id) {
+    window.deleteQuestion =
+        async function (id) {
 
-        const confirmed =
-            confirm("Are you sure you want to delete this question?");
-
-
-        if (!confirmed) {
-            return;
-        }
-
-
-        questions =
-            questions.filter(function (item) {
-                return item.id !== id;
-            });
+            const confirmed =
+                confirm(
+                    "Are you sure you want to delete this question?"
+                );
 
 
-        displayQuestions();
+            if (!confirmed) {
 
-        alert("Question deleted successfully.");
-    };
+                return;
+            }
 
 
+            try {
 
-    // ==========================================
+                await apiRequest(
+                    `/api/questions/${id}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+                alert(
+                    "Question deleted successfully."
+                );
+
+
+                await displayQuestions();
+
+            } catch (error) {
+
+                console.error(
+                    "Delete question error:",
+                    error
+                );
+
+                alert(
+                    error.message
+                );
+
+            }
+        };
+
+
+    // =========================================
     // STUDENTS
-    // ==========================================
+    // =========================================
 
     viewStudentsBtn.addEventListener(
         "click",
-        function () {
+        async function () {
 
-            dashboardContent.style.display = "none";
+            dashboardContent.style.display =
+                "none";
 
-            manageExamsSection.style.display = "none";
+            manageExamsSection.style.display =
+                "none";
 
-            manageQuestionsSection.style.display = "none";
+            manageQuestionsSection.style.display =
+                "none";
 
-            examRegistrationSection.style.display = "none";
+            examRegistrationSection.style.display =
+                "none";
 
-            resultsSection.style.display = "none";
+            resultsSection.style.display =
+                "none";
 
-            studentsSection.style.display = "block";
+            studentsSection.style.display =
+                "block";
 
-            displayStudents();
+
+            await displayStudents();
+
         }
     );
 
 
-
-    // BACK
+    // =========================================
+    // BACK FROM STUDENTS
+    // =========================================
 
     document
-        .getElementById("backFromStudentsBtn")
-        .addEventListener("click", showDashboard);
+        .getElementById(
+            "backFromStudentsBtn"
+        )
+        .addEventListener(
+            "click",
+            showDashboard
+        );
 
 
-
+    // =========================================
     // REGISTER STUDENT
+    // =========================================
 
     document
-        .getElementById("registerStudentBtn")
-        .addEventListener("click", function () {
+        .getElementById(
+            "registerStudentBtn"
+        )
+        .addEventListener(
+            "click",
+            function () {
 
-            document
-                .getElementById("studentFormContainer")
-                .style.display = "block";
-
-            document
-                .getElementById("studentForm")
-                .reset();
-        });
+                document
+                    .getElementById(
+                        "studentFormContainer"
+                    )
+                    .style.display =
+                    "block";
 
 
+                document
+                    .getElementById(
+                        "studentForm"
+                    )
+                    .reset();
 
+            }
+        );
+
+
+    // =========================================
     // CANCEL STUDENT
+    // =========================================
 
     document
-        .getElementById("cancelStudentBtn")
-        .addEventListener("click", function () {
+        .getElementById(
+            "cancelStudentBtn"
+        )
+        .addEventListener(
+            "click",
+            function () {
 
-            document
-                .getElementById("studentFormContainer")
-                .style.display = "none";
-        });
+                document
+                    .getElementById(
+                        "studentFormContainer"
+                    )
+                    .style.display =
+                    "none";
+
+            }
+        );
 
 
-
-    // SAVE STUDENT
+    // =========================================
+    // REGISTER STUDENT
+    // =========================================
 
     document
-        .getElementById("studentForm")
-        .addEventListener("submit", function (event) {
+        .getElementById(
+            "studentForm"
+        )
+        .addEventListener(
+            "submit",
+            async function (event) {
 
-            event.preventDefault();
-
-
-            const name =
-                document.getElementById("studentName").value;
-
-
-            const studentNumber =
-                document.getElementById("studentNumber").value;
+                event.preventDefault();
 
 
-            const email =
-                document.getElementById("studentEmail").value;
+                const name =
+                    document
+                        .getElementById(
+                            "studentName"
+                        )
+                        .value
+                        .trim();
 
 
-            const department =
-                document.getElementById("studentDepartment").value;
+                const studentNumber =
+                    document
+                        .getElementById(
+                            "studentNumber"
+                        )
+                        .value
+                        .trim();
 
 
-            const level =
-                document.getElementById("studentLevel").value;
+                const email =
+                    document
+                        .getElementById(
+                            "studentEmail"
+                        )
+                        .value
+                        .trim();
 
 
-
-            students.push({
-
-                id: nextStudentId++,
-
-                name: name,
-
-                studentNumber: studentNumber,
-
-                email: email,
-
-                department: department,
-
-                level: level,
-
-                status: "Active"
-
-            });
+                const department =
+                    document
+                        .getElementById(
+                            "studentDepartment"
+                        )
+                        .value
+                        .trim();
 
 
-            alert(
-                `${name} has been registered successfully.`
-            );
+                const level =
+                    document
+                        .getElementById(
+                            "studentLevel"
+                        )
+                        .value
+                        .trim();
 
 
-            document
-                .getElementById("studentForm")
-                .reset();
+                const passwordElement =
+                    document.getElementById(
+                        "studentPassword"
+                    );
 
 
-            document
-                .getElementById("studentFormContainer")
-                .style.display = "none";
+                if (!passwordElement) {
+
+                    alert(
+                        "The student password field has not been added to admin.html yet."
+                    );
+
+                    return;
+                }
 
 
-            displayStudents();
-        });
+                const password =
+                    passwordElement.value;
 
 
+                if (
+                    !name ||
+                    !studentNumber ||
+                    !email ||
+                    !department ||
+                    !level ||
+                    !password
+                ) {
 
+                    alert(
+                        "Please complete all student information."
+                    );
+
+                    return;
+                }
+
+
+                try {
+
+                    const data =
+                        await apiRequest(
+                            "/api/auth/register-student",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        name,
+
+                                        email,
+
+                                        password,
+
+                                        student_id:
+                                            studentNumber,
+
+                                        department,
+
+                                        level
+
+                                    })
+                            }
+                        );
+
+
+                    alert(
+                        data.message ||
+                        "Student registered successfully."
+                    );
+
+
+                    document
+                        .getElementById(
+                            "studentForm"
+                        )
+                        .reset();
+
+
+                    document
+                        .getElementById(
+                            "studentFormContainer"
+                        )
+                        .style.display =
+                        "none";
+
+
+                    await displayStudents();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Register student error:",
+                        error
+                    );
+
+                    alert(
+                        error.message
+                    );
+
+                }
+
+            }
+        );
+
+
+    // =========================================
     // DISPLAY STUDENTS
+    // =========================================
 
-    function displayStudents(searchTerm = "") {
+    async function displayStudents(
+        searchTerm = ""
+    ) {
 
         const tableBody =
-            document.getElementById("studentsTableBody");
+            document.getElementById(
+                "studentsTableBody"
+            );
 
 
         tableBody.innerHTML = "";
 
 
-        const filteredStudents =
-            students.filter(function (student) {
+        try {
 
-                const search =
-                    searchTerm.toLowerCase();
+            const url =
+                searchTerm
+                ? `/api/students?search=${encodeURIComponent(searchTerm)}`
+                : "/api/students";
 
 
-                return (
-
-                    student.name.toLowerCase().includes(search)
-
-                    ||
-
-                    student.studentNumber
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    student.email
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    student.department
-                        .toLowerCase()
-                        .includes(search)
-
+            const data =
+                await apiRequest(
+                    url
                 );
 
-            });
+
+            const students =
+                data.students || [];
 
 
+            if (students.length === 0) {
 
-        if (filteredStudents.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center;">
+                            No students found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            students.forEach(
+                function (student) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHTML(
+                                student.name
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                student.student_id
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                student.email
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                student.department
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                student.level
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                student.status
+                            )}
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="btn btn-danger"
+                                onclick="toggleStudentStatus(
+                                    ${student.id},
+                                    '${student.status}'
+                                )"
+                            >
+                                ${
+                                    student.status ===
+                                    "active"
+                                    ? "Deactivate"
+                                    : "Activate"
+                                }
+                            </button>
+
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Display students error:",
+                error
+            );
 
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align:center;">
-                        No students found.
+                        Unable to load students.
                     </td>
                 </tr>
             `;
 
-            return;
         }
-
-
-
-        filteredStudents.forEach(function (student) {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHTML(student.name)}
-                </td>
-
-                <td>
-                    ${escapeHTML(student.studentNumber)}
-                </td>
-
-                <td>
-                    ${escapeHTML(student.email)}
-                </td>
-
-                <td>
-                    ${escapeHTML(student.department)}
-                </td>
-
-                <td>
-                    ${escapeHTML(student.level)}
-                </td>
-
-                <td>
-                    ${escapeHTML(student.status)}
-                </td>
-
-                <td>
-
-                    <button
-                        class="btn btn-danger"
-                        onclick="deactivateStudent(${student.id})">
-
-                        ${student.status === "Active"
-                            ? "Deactivate"
-                            : "Activate"}
-
-                    </button>
-
-                </td>
-            `;
-
-
-            tableBody.appendChild(row);
-        });
     }
 
 
-
+    // =========================================
     // STUDENT SEARCH
+    // =========================================
 
     document
-        .getElementById("studentSearch")
-        .addEventListener("input", function () {
+        .getElementById(
+            "studentSearch"
+        )
+        .addEventListener(
+            "input",
+            function () {
 
-            displayStudents(this.value);
-        });
+                displayStudents(
+                    this.value
+                );
 
-
-
-    // ACTIVATE / DEACTIVATE
-
-    window.deactivateStudent = function (id) {
-
-        const student =
-            students.find(function (item) {
-                return item.id === id;
-            });
-
-
-        if (!student) {
-            return;
-        }
-
-
-        if (student.status === "Active") {
-
-            student.status = "Inactive";
-
-        } else {
-
-            student.status = "Active";
-        }
-
-
-        displayStudents(
-            document.getElementById("studentSearch").value
+            }
         );
-    };
 
 
+    // =========================================
+    // ACTIVATE / DEACTIVATE STUDENT
+    // =========================================
 
-    // ==========================================
+    window.toggleStudentStatus =
+        async function (
+            id,
+            currentStatus
+        ) {
+
+            const newStatus =
+                currentStatus ===
+                "active"
+                ? "inactive"
+                : "active";
+
+
+            try {
+
+                await apiRequest(
+                    `/api/students/${id}/status`,
+                    {
+                        method: "PATCH",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body:
+                            JSON.stringify({
+                                status:
+                                    newStatus
+                            })
+                    }
+                );
+
+
+                alert(
+                    newStatus === "active"
+                    ? "Student activated successfully."
+                    : "Student deactivated successfully."
+                );
+
+
+                await displayStudents(
+                    document
+                        .getElementById(
+                            "studentSearch"
+                        )
+                        .value
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Student status error:",
+                    error
+                );
+
+                alert(
+                    error.message
+                );
+
+            }
+        };
+
+
+    // =========================================
     // EXAM REGISTRATION
-    // ==========================================
+    // =========================================
 
     examRegistrationBtn.addEventListener(
         "click",
-        function () {
+        async function () {
 
-            dashboardContent.style.display = "none";
+            dashboardContent.style.display =
+                "none";
 
-            manageExamsSection.style.display = "none";
+            manageExamsSection.style.display =
+                "none";
 
-            manageQuestionsSection.style.display = "none";
+            manageQuestionsSection.style.display =
+                "none";
 
-            studentsSection.style.display = "none";
+            studentsSection.style.display =
+                "none";
 
-            resultsSection.style.display = "none";
+            resultsSection.style.display =
+                "none";
 
-            examRegistrationSection.style.display = "block";
+            examRegistrationSection.style.display =
+                "block";
 
 
-            loadRegistrationStudents();
+            await loadRegistrationStudents();
 
-            loadRegistrationExams();
+            await loadRegistrationExams();
 
-            displayExamAssignments();
+            await displayExamAssignments();
+
         }
     );
 
 
-
-    // BACK
+    // =========================================
+    // BACK FROM REGISTRATION
+    // =========================================
 
     document
-        .getElementById("backFromRegistrationBtn")
-        .addEventListener("click", showDashboard);
+        .getElementById(
+            "backFromRegistrationBtn"
+        )
+        .addEventListener(
+            "click",
+            showDashboard
+        );
 
 
+    // =========================================
+    // LOAD STUDENTS FOR REGISTRATION
+    // =========================================
 
-    // LOAD STUDENTS
-
-    function loadRegistrationStudents() {
+    async function loadRegistrationStudents() {
 
         const select =
-            document.getElementById("registrationStudent");
+            document.getElementById(
+                "registrationStudent"
+            );
 
 
         select.innerHTML = `
@@ -1334,36 +2156,81 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
 
-        students.forEach(function (student) {
+        try {
 
-            if (student.status !== "Active") {
-                return;
-            }
-
-
-            const option =
-                document.createElement("option");
+            const data =
+                await apiRequest(
+                    "/api/students"
+                );
 
 
-            option.value = student.id;
+            const students =
+                data.students || [];
 
 
-            option.textContent =
-                `${student.name} - ${student.studentNumber}`;
+            students.forEach(
+                function (student) {
+
+                    if (
+                        student.status !==
+                        "active"
+                    ) {
+
+                        return;
+                    }
 
 
-            select.appendChild(option);
-        });
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+
+                    // IMPORTANT:
+                    // Backend expects the users.id
+                    // not the student's visible
+                    // student number.
+
+                    option.value =
+                        student.id;
+
+
+                    option.textContent =
+                        `${student.name} - ${student.student_id}`;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Load registration students error:",
+                error
+            );
+
+            alert(
+                error.message
+            );
+
+        }
     }
 
 
+    // =========================================
+    // LOAD EXAMS FOR REGISTRATION
+    // =========================================
 
-    // LOAD EXAMS
-
-    function loadRegistrationExams() {
+    async function loadRegistrationExams() {
 
         const select =
-            document.getElementById("registrationExam");
+            document.getElementById(
+                "registrationExam"
+            );
 
 
         select.innerHTML = `
@@ -1373,148 +2240,172 @@ document.addEventListener("DOMContentLoaded", function () {
         `;
 
 
-        exams.forEach(function (exam) {
+        try {
 
-            if (exam.status !== "Published") {
-                return;
-            }
-
-
-            const option =
-                document.createElement("option");
+            const exams =
+                await getExams();
 
 
-            option.value = exam.id;
+            exams.forEach(
+                function (exam) {
+
+                    if (
+                        exam.status !==
+                        "published"
+                    ) {
+
+                        return;
+                    }
 
 
-            option.textContent = exam.title;
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
 
 
-            select.appendChild(option);
-        });
+                    option.value =
+                        exam.id;
+
+
+                    option.textContent =
+                        exam.title;
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Load registration exams error:",
+                error
+            );
+
+            alert(
+                error.message
+            );
+
+        }
     }
 
 
-
+    // =========================================
     // ASSIGN EXAM
+    // =========================================
 
     document
-        .getElementById("examRegistrationForm")
-        .addEventListener("submit", function (event) {
+        .getElementById(
+            "examRegistrationForm"
+        )
+        .addEventListener(
+            "submit",
+            async function (event) {
 
-            event.preventDefault();
-
-
-            const studentId =
-                Number(
-                    document.getElementById(
-                        "registrationStudent"
-                    ).value
-                );
+                event.preventDefault();
 
 
-            const examId =
-                Number(
-                    document.getElementById(
-                        "registrationExam"
-                    ).value
-                );
-
-
-
-            const student =
-                students.find(function (item) {
-
-                    return item.id === studentId;
-
-                });
-
-
-
-            const exam =
-                exams.find(function (item) {
-
-                    return item.id === examId;
-
-                });
-
-
-
-            if (!student || !exam) {
-
-                alert(
-                    "Please select a student and an exam."
-                );
-
-                return;
-            }
-
-
-
-            const alreadyAssigned =
-                examAssignments.some(function (assignment) {
-
-                    return (
-
-                        assignment.studentId === studentId
-
-                        &&
-
-                        assignment.examId === examId
-
+                const studentId =
+                    Number(
+                        document
+                            .getElementById(
+                                "registrationStudent"
+                            )
+                            .value
                     );
 
-                });
+
+                const examId =
+                    Number(
+                        document
+                            .getElementById(
+                                "registrationExam"
+                            )
+                            .value
+                    );
 
 
+                if (
+                    !studentId ||
+                    !examId
+                ) {
 
-            if (alreadyAssigned) {
+                    alert(
+                        "Please select a student and an exam."
+                    );
 
-                alert(
-                    "This student has already been assigned to this exam."
-                );
+                    return;
+                }
 
-                return;
+
+                try {
+
+                    const data =
+                        await apiRequest(
+                            "/api/registrations",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify({
+
+                                        student_id:
+                                            studentId,
+
+                                        exam_id:
+                                            examId
+
+                                    })
+                            }
+                        );
+
+
+                    alert(
+                        data.message ||
+                        "Student assigned successfully."
+                    );
+
+
+                    document
+                        .getElementById(
+                            "examRegistrationForm"
+                        )
+                        .reset();
+
+
+                    await displayExamAssignments();
+
+                } catch (error) {
+
+                    console.error(
+                        "Exam registration error:",
+                        error
+                    );
+
+                    alert(
+                        error.message
+                    );
+
+                }
+
             }
+        );
 
 
+    // =========================================
+    // DISPLAY EXAM ASSIGNMENTS
+    // =========================================
 
-            examAssignments.push({
-
-                studentId: student.id,
-
-                studentName: student.name,
-
-                studentNumber: student.studentNumber,
-
-                examId: exam.id,
-
-                examTitle: exam.title,
-
-                status: "Assigned"
-
-            });
-
-
-
-            alert(
-                `${student.name} has been assigned to ${exam.title}.`
-            );
-
-
-            document
-                .getElementById("examRegistrationForm")
-                .reset();
-
-
-            displayExamAssignments();
-        });
-
-
-
-    // DISPLAY ASSIGNMENTS
-
-    function displayExamAssignments() {
+    async function displayExamAssignments() {
 
         const tableBody =
             document.getElementById(
@@ -1525,308 +2416,497 @@ document.addEventListener("DOMContentLoaded", function () {
         tableBody.innerHTML = "";
 
 
+        try {
 
-        if (examAssignments.length === 0) {
+            const data =
+                await apiRequest(
+                    "/api/registrations"
+                );
+
+
+            const registrations =
+                data.registrations || [];
+
+
+            if (
+                registrations.length === 0
+            ) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align:center;">
+                            No exam assignments yet.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            registrations.forEach(
+                function (
+                    registration
+                ) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHTML(
+                                registration.student_name
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                registration.student_number
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                registration.exam_title
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                registration.status
+                            )}
+                        </td>
+
+                        <td>
+
+                            <button
+                                class="btn btn-danger"
+                                onclick="removeExamAssignment(
+                                    ${registration.id}
+                                )"
+                            >
+                                Remove
+                            </button>
+
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Display assignments error:",
+                error
+            );
 
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="5" style="text-align:center;">
-                        No exam assignments yet.
+                        Unable to load assignments.
                     </td>
                 </tr>
             `;
 
-            return;
         }
-
-
-
-        examAssignments.forEach(
-            function (assignment, index) {
-
-                const row =
-                    document.createElement("tr");
-
-
-                row.innerHTML = `
-
-                    <td>
-                        ${escapeHTML(
-                            assignment.studentName
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            assignment.studentNumber
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            assignment.examTitle
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHTML(
-                            assignment.status
-                        )}
-                    </td>
-
-                    <td>
-
-                        <button
-                            class="btn btn-danger"
-                            onclick="removeExamAssignment(${index})">
-
-                            Remove
-
-                        </button>
-
-                    </td>
-                `;
-
-
-                tableBody.appendChild(row);
-            }
-        );
     }
 
 
+    // =========================================
+    // REMOVE EXAM ASSIGNMENT
+    // =========================================
 
-    // REMOVE ASSIGNMENT
+    window.removeExamAssignment =
+        async function (id) {
 
-    window.removeExamAssignment = function (index) {
-
-        const assignment =
-            examAssignments[index];
-
-
-        if (!assignment) {
-            return;
-        }
-
-
-        const confirmed =
-            confirm(
-                `Remove ${assignment.examTitle} from ${assignment.studentName}?`
-            );
+            const confirmed =
+                confirm(
+                    "Are you sure you want to remove this exam assignment?"
+                );
 
 
-        if (!confirmed) {
-            return;
-        }
+            if (!confirmed) {
+
+                return;
+            }
 
 
-        examAssignments.splice(index, 1);
+            try {
+
+                await apiRequest(
+                    `/api/registrations/${id}`,
+                    {
+                        method: "DELETE"
+                    }
+                );
 
 
-        displayExamAssignments();
-    };
+                alert(
+                    "Student removed from exam successfully."
+                );
 
 
+                await displayExamAssignments();
 
-    // ==========================================
+            } catch (error) {
+
+                console.error(
+                    "Remove assignment error:",
+                    error
+                );
+
+                alert(
+                    error.message
+                );
+
+            }
+        };
+
+
+    // =========================================
     // RESULTS
-    // ==========================================
+    // =========================================
 
     viewResultsBtn.addEventListener(
         "click",
-        function () {
+        async function () {
 
-            dashboardContent.style.display = "none";
+            dashboardContent.style.display =
+                "none";
 
-            manageExamsSection.style.display = "none";
+            manageExamsSection.style.display =
+                "none";
 
-            manageQuestionsSection.style.display = "none";
+            manageQuestionsSection.style.display =
+                "none";
 
-            studentsSection.style.display = "none";
+            studentsSection.style.display =
+                "none";
 
-            examRegistrationSection.style.display = "none";
+            examRegistrationSection.style.display =
+                "none";
 
-            resultsSection.style.display = "block";
+            resultsSection.style.display =
+                "block";
 
-            displayResults();
+
+            await displayResults();
+
         }
     );
 
 
-
-    // BACK
+    // =========================================
+    // BACK FROM RESULTS
+    // =========================================
 
     document
-        .getElementById("backFromResultsBtn")
-        .addEventListener("click", showDashboard);
+        .getElementById(
+            "backFromResultsBtn"
+        )
+        .addEventListener(
+            "click",
+            showDashboard
+        );
 
 
-
+    // =========================================
     // DISPLAY RESULTS
+    // =========================================
 
-    function displayResults(searchTerm = "") {
+    async function displayResults(
+        searchTerm = ""
+    ) {
 
         const tableBody =
-            document.getElementById("resultsTableBody");
+            document.getElementById(
+                "resultsTableBody"
+            );
 
 
         tableBody.innerHTML = "";
 
 
-        const filteredResults =
-            results.filter(function (result) {
+        try {
 
-                const search =
-                    searchTerm.toLowerCase();
-
-
-                return (
-
-                    result.studentName
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    result.studentNumber
-                        .toLowerCase()
-                        .includes(search)
-
-                    ||
-
-                    result.exam
-                        .toLowerCase()
-                        .includes(search)
-
+            const data =
+                await apiRequest(
+                    "/api/results"
                 );
 
-            });
+
+            const results =
+                data.results || [];
 
 
+            const search =
+                searchTerm.toLowerCase();
 
-        if (filteredResults.length === 0) {
+
+            const filteredResults =
+                results.filter(
+                    function (result) {
+
+                        return (
+
+                            result.student_name
+                                .toLowerCase()
+                                .includes(
+                                    search
+                                )
+
+                            ||
+
+                            result.student_id
+                                .toLowerCase()
+                                .includes(
+                                    search
+                                )
+
+                            ||
+
+                            result.exam_title
+                                .toLowerCase()
+                                .includes(
+                                    search
+                                )
+
+                        );
+
+                    }
+                );
+
+
+            if (
+                filteredResults.length === 0
+            ) {
+
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align:center;">
+                            No results found.
+                        </td>
+                    </tr>
+                `;
+
+                return;
+            }
+
+
+            filteredResults.forEach(
+                function (result) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHTML(
+                                result.student_name
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                result.student_id
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                result.exam_title
+                            )}
+                        </td>
+
+                        <td>
+                            ${result.score}
+                            /
+                            ${result.total_marks}
+                        </td>
+
+                        <td>
+                            ${result.percentage}%
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                result.status
+                            )}
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Display results error:",
+                error
+            );
 
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="6" style="text-align:center;">
-                        No results found.
+                        Unable to load results.
                     </td>
                 </tr>
             `;
 
-            return;
         }
-
-
-
-        filteredResults.forEach(function (result) {
-
-            const row =
-                document.createElement("tr");
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHTML(result.studentName)}
-                </td>
-
-                <td>
-                    ${escapeHTML(result.studentNumber)}
-                </td>
-
-                <td>
-                    ${escapeHTML(result.exam)}
-                </td>
-
-                <td>
-                    ${result.score}
-                </td>
-
-                <td>
-                    ${result.percentage}%
-                </td>
-
-                <td>
-                    ${escapeHTML(result.status)}
-                </td>
-
-            `;
-
-
-            tableBody.appendChild(row);
-        });
     }
 
 
-
+    // =========================================
     // RESULT SEARCH
+    // =========================================
 
     document
-        .getElementById("resultSearch")
-        .addEventListener("input", function () {
+        .getElementById(
+            "resultSearch"
+        )
+        .addEventListener(
+            "input",
+            function () {
 
-            displayResults(this.value);
-        });
+                displayResults(
+                    this.value
+                );
+
+            }
+        );
 
 
+    // =========================================
+    // DISPLAY RECENT RESULTS
+    // =========================================
 
-    // ==========================================
-    // RECENT RESULTS
-    // ==========================================
-
-    function displayRecentResults() {
+    async function displayRecentResults() {
 
         const tableBody =
-            document.getElementById("recentResultsBody");
+            document.getElementById(
+                "recentResultsBody"
+            );
 
 
         tableBody.innerHTML = "";
 
 
-        results.slice(0, 5).forEach(
-            function (result) {
+        try {
 
-                const row =
-                    document.createElement("tr");
+            const data =
+                await apiRequest(
+                    "/api/results"
+                );
 
 
-                row.innerHTML = `
+            const results =
+                data.results || [];
 
-                    <td>
-                        ${escapeHTML(
-                            result.studentName
-                        )}
-                    </td>
 
-                    <td>
-                        ${escapeHTML(
-                            result.exam
-                        )}
-                    </td>
+            const recentResults =
+                results.slice(
+                    0,
+                    5
+                );
 
-                    <td>
-                        ${result.score}
-                    </td>
 
-                    <td>
-                        ${escapeHTML(
-                            result.status
-                        )}
-                    </td>
+            if (
+                recentResults.length === 0
+            ) {
 
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align:center;">
+                            No results yet.
+                        </td>
+                    </tr>
                 `;
 
-
-                tableBody.appendChild(row);
+                return;
             }
-        );
+
+
+            recentResults.forEach(
+                function (result) {
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHTML(
+                                result.student_name
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                result.exam_title
+                            )}
+                        </td>
+
+                        <td>
+                            ${result.score}
+                            /
+                            ${result.total_marks}
+                        </td>
+
+                        <td>
+                            ${escapeHTML(
+                                result.status
+                            )}
+                        </td>
+
+                    `;
+
+
+                    tableBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Recent results error:",
+                error
+            );
+
+        }
     }
 
 
-
-    // ==========================================
+    // =========================================
     // DASHBOARD BUTTON
-    // ==========================================
+    // =========================================
 
     dashboardBtn.addEventListener(
         "click",
@@ -1835,60 +2915,121 @@ document.addEventListener("DOMContentLoaded", function () {
             event.preventDefault();
 
             showDashboard();
+
         }
     );
 
 
-
-    // ==========================================
+    // =========================================
     // LOGOUT
-    // ==========================================
+    // =========================================
 
     const logoutBtn =
-        document.getElementById("logoutBtn");
+        document.getElementById(
+            "logoutBtn"
+        );
 
 
-    logoutBtn.addEventListener(
-        "click",
-        function (event) {
+    if (logoutBtn) {
 
-            const confirmLogout =
-                confirm(
-                    "Are you sure you want to logout?"
+        logoutBtn.addEventListener(
+            "click",
+            async function (event) {
+
+                event.preventDefault();
+
+
+                const confirmed =
+                    confirm(
+                        "Are you sure you want to logout?"
+                    );
+
+
+                if (!confirmed) {
+
+                    return;
+                }
+
+
+                try {
+
+                    await apiRequest(
+                        "/api/auth/logout",
+                        {
+                            method: "POST"
+                        }
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        "Logout error:",
+                        error
+                    );
+
+                }
+
+
+                localStorage.removeItem(
+                    "token"
+                );
+
+                localStorage.removeItem(
+                    "user"
                 );
 
 
-            if (!confirmLogout) {
+                window.location.href =
+                    "admin-login.html";
 
-                event.preventDefault();
             }
-        }
-    );
+        );
 
-
-
-    // ==========================================
-    // ESCAPE HTML
-    // ==========================================
-
-    function escapeHTML(value) {
-
-        return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
     }
 
 
+    // =========================================
+    // ESCAPE HTML
+    // =========================================
 
-    // ==========================================
+    function escapeHTML(value) {
+
+        return String(
+            value ?? ""
+        )
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    // =========================================
     // INITIAL LOAD
-    // ==========================================
+    // =========================================
+
+    loadAdminInformation();
 
     displayRecentResults();
 
     showDashboard();
 
 });
+```
