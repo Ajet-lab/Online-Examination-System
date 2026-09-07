@@ -1,0 +1,333 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <!-- =========================================
+         NAVIGATION BAR
+    ========================================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Obafemi Awolowo University
+        </div>
+
+        <ul class="nav-links">
+
+            <li>
+                <a href="index.html">
+                    Home
+                </a>
+            </li>
+
+            <li>
+                <a href="login.html">
+                    Student Login
+                </a>
+            </li>
+
+            <li>
+                <a href="admin-login.html">
+                    Admin Login
+                </a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+    <!-- =========================================
+         ADMIN LOGIN
+    ========================================= -->
+
+    <main class="container">
+
+        <h1 class="page-title">
+            Admin Login
+        </h1>
+
+        <div class="card">
+
+            <form id="adminLoginForm">
+
+                <label for="admin-email">
+                    Admin Email Address
+                </label>
+
+                <br>
+
+                <input
+                    type="email"
+                    id="admin-email"
+                    name="email"
+                    placeholder="Enter admin email"
+                    required
+                >
+
+                <br><br>
+
+
+                <label for="admin-password">
+                    Password
+                </label>
+
+                <br>
+
+                <input
+                    type="password"
+                    id="admin-password"
+                    name="password"
+                    placeholder="Enter admin password"
+                    required
+                >
+
+                <br><br>
+
+
+                <!-- =========================================
+                     ERROR MESSAGE
+                ========================================= -->
+
+                <p
+                    id="errorMessage"
+                    style="color: #dc3545; display: none;"
+                ></p>
+
+                <br>
+
+
+                <!-- =========================================
+                     LOGIN BUTTON
+                ========================================= -->
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="adminLoginButton"
+                >
+                    Login as Admin
+                </button>
+
+            </form>
+
+            <br>
+
+            <p>
+                <a href="login.html">
+                    Student Login
+                </a>
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================= -->
+
+    <footer>
+
+        <p>
+            Online Examination System
+        </p>
+
+    </footer>
+
+
+    <!-- =========================================
+         ADMIN LOGIN JAVASCRIPT
+    ========================================= -->
+
+    <script>
+
+        // =========================================
+        // ADMIN LOGIN FORM
+        // =========================================
+
+        document
+            .getElementById('adminLoginForm')
+            .addEventListener(
+                'submit',
+                async function(event) {
+
+                    event.preventDefault();
+
+                    const email =
+                        document
+                            .getElementById('admin-email')
+                            .value
+                            .trim();
+
+                    const password =
+                        document
+                            .getElementById('admin-password')
+                            .value;
+
+                    const errorMessage =
+                        document
+                            .getElementById('errorMessage');
+
+                    const loginButton =
+                        document
+                            .getElementById(
+                                'adminLoginButton'
+                            );
+
+
+                    errorMessage.textContent = '';
+
+                    errorMessage.style.display =
+                        'none';
+
+                    loginButton.disabled = true;
+
+                    loginButton.textContent =
+                        'Logging in...';
+
+
+                    // =========================================
+                    // SEND LOGIN REQUEST TO BACKEND
+                    // =========================================
+
+                    try {
+
+                        const response =
+                            await fetch(
+                                'http://localhost:5000/api/auth/login',
+                                {
+                                    method: 'POST',
+
+                                    headers: {
+                                        'Content-Type':
+                                            'application/json'
+                                    },
+
+                                    body: JSON.stringify({
+                                        email: email,
+                                        password: password
+                                    })
+                                }
+                            );
+
+
+                        const data =
+                            await response.json();
+
+
+                        // =========================================
+                        // HANDLE LOGIN ERROR
+                        // =========================================
+
+                        if (!response.ok) {
+
+                            errorMessage.textContent =
+                                data.message ||
+                                'Invalid admin email or password.';
+
+                            errorMessage.style.display =
+                                'block';
+
+                            loginButton.disabled =
+                                false;
+
+                            loginButton.textContent =
+                                'Login as Admin';
+
+                            return;
+                        }
+
+
+                        // =========================================
+                        // MAKE SURE THIS IS AN ADMIN ACCOUNT
+                        // =========================================
+
+                        if (
+                            !data.user ||
+                            data.user.role !== 'admin'
+                        ) {
+
+                            errorMessage.textContent =
+                                'This account does not have administrator access.';
+
+                            errorMessage.style.display =
+                                'block';
+
+                            loginButton.disabled =
+                                false;
+
+                            loginButton.textContent =
+                                'Login as Admin';
+
+                            return;
+                        }
+
+
+                        // =========================================
+                        // SAVE LOGIN INFORMATION
+                        // =========================================
+
+                        localStorage.setItem(
+                            'token',
+                            data.token
+                        );
+
+                        localStorage.setItem(
+                            'user',
+                            JSON.stringify(data.user)
+                        );
+
+
+                        // =========================================
+                        // GO TO ADMIN DASHBOARD
+                        // =========================================
+
+                        window.location.href =
+                            'admin.html';
+
+                    } catch (error) {
+
+                        console.error(
+                            'Admin login error:',
+                            error
+                        );
+
+                        errorMessage.textContent =
+                            'Unable to connect to the server.';
+
+                        errorMessage.style.display =
+                            'block';
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            'Login as Admin';
+                    }
+
+                }
+            );
+
+    </script>
+
+</body>
+
+</html>
+```
