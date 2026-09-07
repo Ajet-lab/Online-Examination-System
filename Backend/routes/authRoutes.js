@@ -1,3 +1,4 @@
+```javascript
 const express = require('express');
 
 const {
@@ -7,7 +8,10 @@ const {
     logout
 } = require('../controllers/authController');
 
-const { protect } = require('../middleware/auth');
+const {
+    protect,
+    restrictTo
+} = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -16,28 +20,46 @@ const router = express.Router();
 // LOGIN
 // =========================================
 
-router.post('/login', login);
+router.post(
+    '/login',
+    login
+);
 
 
 // =========================================
 // REGISTER STUDENT
 // =========================================
+// Only administrators can register students.
 
-router.post('/register-student', protect, registerStudent);
+router.post(
+    '/register-student',
+    protect,
+    restrictTo('admin'),
+    registerStudent
+);
 
 
 // =========================================
 // GET CURRENT USER
 // =========================================
 
-router.get('/me', protect, getMe);
+router.get(
+    '/me',
+    protect,
+    getMe
+);
 
 
 // =========================================
 // LOGOUT
 // =========================================
 
-router.post('/logout', protect, logout);
+router.post(
+    '/logout',
+    protect,
+    logout
+);
 
 
 module.exports = router;
+```
