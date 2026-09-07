@@ -1,20 +1,31 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Admin Dashboard</title>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
 </head>
 
 <body>
 
-    <!-- =========================
+
+    <!-- =========================================
          NAVBAR
-    ========================== -->
+    ========================================= -->
 
     <nav class="navbar">
 
@@ -25,13 +36,19 @@
         <ul class="nav-links">
 
             <li>
-                <a href="#" id="dashboardBtn">
+                <a
+                    href="#"
+                    id="dashboardBtn"
+                >
                     Dashboard
                 </a>
             </li>
 
             <li>
-                <a href="admin-login.html" id="logoutBtn">
+                <a
+                    href="admin-login.html"
+                    id="logoutBtn"
+                >
                     Logout
                 </a>
             </li>
@@ -41,18 +58,46 @@
     </nav>
 
 
-    <!-- =========================
+    <!-- =========================================
          DASHBOARD
-    ========================== -->
+    ========================================= -->
 
-    <main class="container" id="dashboardContent">
+    <main
+        class="container"
+        id="dashboardContent"
+    >
 
         <h1 class="page-title">
             Admin Dashboard
         </h1>
 
 
-        <!-- MANAGEMENT CARDS -->
+        <!-- =========================================
+             ADMIN WELCOME
+        ========================================= -->
+
+        <div class="card">
+
+            <h2>
+                Welcome,
+                <span id="adminName">
+                    Administrator
+                </span>
+            </h2>
+
+            <br>
+
+            <p>
+                From this dashboard, you can manage examinations,
+                questions, students, exam registrations and results.
+            </p>
+
+        </div>
+
+
+        <!-- =========================================
+             MANAGEMENT CARDS
+        ========================================= -->
 
         <div class="admin-grid">
 
@@ -71,10 +116,9 @@
 
                 <button
                     class="btn btn-primary"
-                    id="manageExamsBtn">
-
+                    id="manageExamsBtn"
+                >
                     Manage Exams
-
                 </button>
 
             </div>
@@ -94,10 +138,9 @@
 
                 <button
                     class="btn btn-primary"
-                    id="manageQuestionsBtn">
-
+                    id="manageQuestionsBtn"
+                >
                     Manage Questions
-
                 </button>
 
             </div>
@@ -117,10 +160,9 @@
 
                 <button
                     class="btn btn-primary"
-                    id="viewStudentsBtn">
-
+                    id="viewStudentsBtn"
+                >
                     Students
-
                 </button>
 
             </div>
@@ -140,10 +182,9 @@
 
                 <button
                     class="btn btn-primary"
-                    id="viewResultsBtn">
-
+                    id="viewResultsBtn"
+                >
                     View Results
-
                 </button>
 
             </div>
@@ -163,10 +204,9 @@
 
                 <button
                     class="btn btn-primary"
-                    id="examRegistrationBtn">
-
+                    id="examRegistrationBtn"
+                >
                     Exam Registration
-
                 </button>
 
             </div>
@@ -174,9 +214,9 @@
         </div>
 
 
-        <!-- =========================
+        <!-- =========================================
              RECENT RESULTS
-        ========================== -->
+        ========================================= -->
 
         <section class="card">
 
@@ -223,23 +263,23 @@
     </main>
 
 
-    <!-- =========================
+    <!-- =========================================
          MANAGE EXAMS
-    ========================== -->
+    ========================================= -->
 
     <section
         class="container"
         id="manageExamsSection"
-        style="display: none;">
+        style="display: none;"
+    >
 
         <div class="card">
 
             <button
                 class="btn btn-primary"
-                id="backToDashboardBtn">
-
+                id="backToDashboardBtn"
+            >
                 ← Back to Dashboard
-
             </button>
 
             <h1 class="page-title">
@@ -249,18 +289,20 @@
 
             <button
                 class="btn btn-success"
-                id="addExamBtn">
-
+                id="addExamBtn"
+            >
                 + Add New Exam
-
             </button>
 
 
-            <!-- EXAM FORM -->
+            <!-- =========================================
+                 EXAM FORM
+            ========================================= -->
 
             <div
                 id="examFormContainer"
-                style="display: none; margin-top: 20px;">
+                style="display: none; margin-top: 20px;"
+            >
 
                 <div class="card">
 
@@ -274,7 +316,8 @@
 
                         <input
                             type="hidden"
-                            id="examId">
+                            id="examId"
+                        >
 
 
                         <label for="examTitle">
@@ -285,7 +328,8 @@
                             type="text"
                             id="examTitle"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="examDescription">
@@ -295,7 +339,8 @@
                         <textarea
                             id="examDescription"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"></textarea>
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        ></textarea>
 
 
                         <label for="examDuration">
@@ -307,24 +352,23 @@
                             id="examDuration"
                             min="1"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <button
                             type="submit"
-                            class="btn btn-success">
-
+                            class="btn btn-success"
+                        >
                             Save Exam
-
                         </button>
 
                         <button
                             type="button"
                             class="btn btn-danger"
-                            id="cancelExamBtn">
-
+                            id="cancelExamBtn"
+                        >
                             Cancel
-
                         </button>
 
                     </form>
@@ -337,7 +381,9 @@
             <br>
 
 
-            <!-- EXAMS TABLE -->
+            <!-- =========================================
+                 EXAMS TABLE
+            ========================================= -->
 
             <table>
 
@@ -380,23 +426,23 @@
     </section>
 
 
-    <!-- =========================
+    <!-- =========================================
          MANAGE QUESTIONS
-    ========================== -->
+    ========================================= -->
 
     <section
         class="container"
         id="manageQuestionsSection"
-        style="display: none;">
+        style="display: none;"
+    >
 
         <div class="card">
 
             <button
                 class="btn btn-primary"
-                id="backFromQuestionsBtn">
-
+                id="backFromQuestionsBtn"
+            >
                 ← Back to Dashboard
-
             </button>
 
             <h1 class="page-title">
@@ -410,7 +456,8 @@
 
             <select
                 id="questionExamSelect"
-                style="width: 100%; padding: 10px; margin: 10px 0 20px;">
+                style="width: 100%; padding: 10px; margin: 10px 0 20px;"
+            >
 
                 <option value="">
                     Select an exam
@@ -421,18 +468,20 @@
 
             <button
                 class="btn btn-success"
-                id="addQuestionBtn">
-
+                id="addQuestionBtn"
+            >
                 + Add Question
-
             </button>
 
 
-            <!-- QUESTION FORM -->
+            <!-- =========================================
+                 QUESTION FORM
+            ========================================= -->
 
             <div
                 id="questionFormContainer"
-                style="display: none; margin-top: 20px;">
+                style="display: none; margin-top: 20px;"
+            >
 
                 <div class="card">
 
@@ -446,7 +495,8 @@
 
                         <input
                             type="hidden"
-                            id="questionId">
+                            id="questionId"
+                        >
 
 
                         <label for="questionText">
@@ -456,7 +506,8 @@
                         <textarea
                             id="questionText"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"></textarea>
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        ></textarea>
 
 
                         <label for="optionA">
@@ -467,7 +518,8 @@
                             type="text"
                             id="optionA"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="optionB">
@@ -478,7 +530,8 @@
                             type="text"
                             id="optionB"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="optionC">
@@ -489,7 +542,8 @@
                             type="text"
                             id="optionC"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="optionD">
@@ -500,7 +554,8 @@
                             type="text"
                             id="optionD"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="correctAnswer">
@@ -510,7 +565,8 @@
                         <select
                             id="correctAnswer"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
                             <option value="">
                                 Select Correct Answer
@@ -545,24 +601,23 @@
                             value="1"
                             min="1"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <button
                             type="submit"
-                            class="btn btn-success">
-
+                            class="btn btn-success"
+                        >
                             Save Question
-
                         </button>
 
                         <button
                             type="button"
                             class="btn btn-danger"
-                            id="cancelQuestionBtn">
-
+                            id="cancelQuestionBtn"
+                        >
                             Cancel
-
                         </button>
 
                     </form>
@@ -575,7 +630,9 @@
             <br>
 
 
-            <!-- QUESTIONS TABLE -->
+            <!-- =========================================
+                 QUESTIONS TABLE
+            ========================================= -->
 
             <table>
 
@@ -614,23 +671,23 @@
     </section>
 
 
-    <!-- =========================
+    <!-- =========================================
          STUDENTS
-    ========================== -->
+    ========================================= -->
 
     <section
         class="container"
         id="studentsSection"
-        style="display: none;">
+        style="display: none;"
+    >
 
         <div class="card">
 
             <button
                 class="btn btn-primary"
-                id="backFromStudentsBtn">
-
+                id="backFromStudentsBtn"
+            >
                 ← Back to Dashboard
-
             </button>
 
             <h1 class="page-title">
@@ -640,18 +697,20 @@
 
             <button
                 class="btn btn-success"
-                id="registerStudentBtn">
-
+                id="registerStudentBtn"
+            >
                 + Register Student
-
             </button>
 
 
-            <!-- STUDENT REGISTRATION FORM -->
+            <!-- =========================================
+                 STUDENT REGISTRATION FORM
+            ========================================= -->
 
             <div
                 id="studentFormContainer"
-                style="display: none; margin-top: 20px;">
+                style="display: none; margin-top: 20px;"
+            >
 
                 <div class="card">
 
@@ -671,7 +730,8 @@
                             type="text"
                             id="studentName"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="studentNumber">
@@ -682,7 +742,8 @@
                             type="text"
                             id="studentNumber"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="studentEmail">
@@ -693,7 +754,22 @@
                             type="email"
                             id="studentEmail"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
+
+
+                        <label for="studentPassword">
+                            Student Password
+                        </label>
+
+                        <input
+                            type="password"
+                            id="studentPassword"
+                            placeholder="Create student password"
+                            minlength="6"
+                            required
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="studentDepartment">
@@ -704,7 +780,8 @@
                             type="text"
                             id="studentDepartment"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
 
                         <label for="studentLevel">
@@ -714,7 +791,8 @@
                         <select
                             id="studentLevel"
                             required
-                            style="width: 100%; padding: 10px; margin: 8px 0 15px;">
+                            style="width: 100%; padding: 10px; margin: 8px 0 15px;"
+                        >
 
                             <option value="">
                                 Select Level
@@ -745,19 +823,17 @@
 
                         <button
                             type="submit"
-                            class="btn btn-success">
-
+                            class="btn btn-success"
+                        >
                             Register Student
-
                         </button>
 
                         <button
                             type="button"
                             class="btn btn-danger"
-                            id="cancelStudentBtn">
-
+                            id="cancelStudentBtn"
+                        >
                             Cancel
-
                         </button>
 
                     </form>
@@ -770,16 +846,21 @@
             <br>
 
 
-            <!-- SEARCH -->
+            <!-- =========================================
+                 SEARCH
+            ========================================= -->
 
             <input
                 type="text"
                 id="studentSearch"
                 placeholder="Search students..."
-                style="width: 100%; padding: 12px; margin-bottom: 20px;">
+                style="width: 100%; padding: 12px; margin-bottom: 20px;"
+            >
 
 
-            <!-- STUDENT TABLE -->
+            <!-- =========================================
+                 STUDENT TABLE
+            ========================================= -->
 
             <table>
 
@@ -830,23 +911,23 @@
     </section>
 
 
-    <!-- =========================
+    <!-- =========================================
          EXAM REGISTRATION
-    ========================== -->
+    ========================================= -->
 
     <section
         class="container"
         id="examRegistrationSection"
-        style="display: none;">
+        style="display: none;"
+    >
 
         <div class="card">
 
             <button
                 class="btn btn-primary"
-                id="backFromRegistrationBtn">
-
+                id="backFromRegistrationBtn"
+            >
                 ← Back to Dashboard
-
             </button>
 
             <h1 class="page-title">
@@ -854,7 +935,9 @@
             </h1>
 
 
-            <!-- ASSIGN EXAM -->
+            <!-- =========================================
+                 ASSIGN EXAM
+            ========================================= -->
 
             <div class="card">
 
@@ -874,7 +957,8 @@
                     <select
                         id="registrationStudent"
                         required
-                        style="width: 100%; padding: 10px; margin: 8px 0 20px;">
+                        style="width: 100%; padding: 10px; margin: 8px 0 20px;"
+                    >
 
                         <option value="">
                             Select Student
@@ -890,7 +974,8 @@
                     <select
                         id="registrationExam"
                         required
-                        style="width: 100%; padding: 10px; margin: 8px 0 20px;">
+                        style="width: 100%; padding: 10px; margin: 8px 0 20px;"
+                    >
 
                         <option value="">
                             Select Exam
@@ -901,10 +986,9 @@
 
                     <button
                         type="submit"
-                        class="btn btn-success">
-
+                        class="btn btn-success"
+                    >
                         Assign Exam
-
                     </button>
 
                 </form>
@@ -912,7 +996,9 @@
             </div>
 
 
-            <!-- ASSIGNMENTS -->
+            <!-- =========================================
+                 ASSIGNMENTS
+            ========================================= -->
 
             <div class="card">
 
@@ -965,23 +1051,23 @@
     </section>
 
 
-    <!-- =========================
+    <!-- =========================================
          RESULTS
-    ========================== -->
+    ========================================= -->
 
     <section
         class="container"
         id="resultsSection"
-        style="display: none;">
+        style="display: none;"
+    >
 
         <div class="card">
 
             <button
                 class="btn btn-primary"
-                id="backFromResultsBtn">
-
+                id="backFromResultsBtn"
+            >
                 ← Back to Dashboard
-
             </button>
 
             <h1 class="page-title">
@@ -993,7 +1079,8 @@
                 type="text"
                 id="resultSearch"
                 placeholder="Search results..."
-                style="width: 100%; padding: 12px; margin-bottom: 20px;">
+                style="width: 100%; padding: 12px; margin-bottom: 20px;"
+            >
 
 
             <table>
@@ -1041,9 +1128,9 @@
     </section>
 
 
-    <!-- =========================
+    <!-- =========================================
          FOOTER
-    ========================== -->
+    ========================================= -->
 
     <footer>
 
@@ -1054,10 +1141,13 @@
     </footer>
 
 
-    <!-- JAVASCRIPT -->
+    <!-- =========================================
+         ADMIN JAVASCRIPT
+    ========================================= -->
 
     <script src="admin.js"></script>
 
 </body>
 
 </html>
+```
