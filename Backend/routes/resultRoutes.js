@@ -2,6 +2,7 @@
 const express = require('express');
 
 const {
+    startExam,
     submitExam,
     getMyResults,
     getAllResults,
@@ -17,6 +18,20 @@ const router = express.Router();
 
 
 // =========================================
+// START EXAM
+// =========================================
+// Students must start the exam before submitting.
+// This records the actual server-side start time.
+
+router.post(
+    '/exam/:examId/start',
+    protect,
+    restrictTo('student'),
+    startExam
+);
+
+
+// =========================================
 // SUBMIT EXAM
 // =========================================
 
@@ -29,25 +44,18 @@ router.post(
 
 
 // =========================================
-// GET MY RESULTS
+// STUDENT RESULTS
 // =========================================
-// Students no longer need access to results.
-// This route is intentionally disabled by the
-// frontend and will not be used.
+// Students are NOT allowed to access results.
+// This route intentionally remains disabled.
 
 
-/*
-
-
-router.get(
-    '/my-results',
-    protect,
-    restrictTo('student'),
-    getMyResults
-);
-
-
-*/
+// router.get(
+//     '/my-results',
+//     protect,
+//     restrictTo('student'),
+//     getMyResults
+// );
 
 
 // =========================================
