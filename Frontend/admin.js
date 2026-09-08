@@ -1,4 +1,3 @@
-```javascript
 document.addEventListener("DOMContentLoaded", function () {
 
     // =========================================
@@ -7,6 +6,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const token =
         localStorage.getItem("token");
+
+    // =========================================
+// API BASE URL
+// =========================================
+
+const API_BASE_URL =
+    "https://online-examination-backend-mr8j.onrender.com";
 
 
     // =========================================
@@ -86,10 +92,11 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
 
-        const response =
-            await fetch(
-                url,
-                requestOptions
+         const response =
+    await fetch(
+        `${API_BASE_URL}${url}`,
+        requestOptions
+    );
             );
 
 
