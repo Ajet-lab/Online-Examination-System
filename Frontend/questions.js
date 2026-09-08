@@ -1,4 +1,3 @@
-```javascript
 // =========================================
 // EXAM VARIABLES
 // =========================================
@@ -14,6 +13,14 @@ let timeRemaining = 30 * 60;
 let timer;
 
 let examSubmitted = false;
+
+
+// =========================================
+// API BASE URL
+// =========================================
+
+const API_BASE_URL =
+    'https://online-examination-backend-mr8j.onrender.com';
 
 
 // =========================================
@@ -76,7 +83,7 @@ async function loadQuestions() {
 
         const examResponse =
             await fetch(
-                `/api/exams/${examId}`,
+                `${API_BASE_URL}/api/exams/${examId}`,
                 {
                     headers: {
                         'Authorization':
@@ -124,7 +131,7 @@ async function loadQuestions() {
 
         const response =
             await fetch(
-                `/api/questions/exam/${examId}`,
+                `${API_BASE_URL}/api/questions/exam/${examId}`,
                 {
                     headers: {
                         'Authorization':
@@ -180,7 +187,7 @@ async function loadQuestions() {
 
         const startResponse =
             await fetch(
-                `/api/results/exam/${examId}/start`,
+                `${API_BASE_URL}/api/results/exam/${examId}/start`,
                 {
                     method: 'POST',
 
@@ -805,7 +812,7 @@ async function submitExam() {
 
         const response =
             await fetch(
-                `/api/results/exam/${examId}/submit`,
+                `${API_BASE_URL}/api/results/exam/${examId}/submit`,
                 {
                     method: 'POST',
 
@@ -922,4 +929,3 @@ document
 // =========================================
 
 loadQuestions();
-```
